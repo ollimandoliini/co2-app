@@ -4,9 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pandas = "*"
-flask-restful = "*"
-matplotlib = "*"
 
 [dev-packages]
 

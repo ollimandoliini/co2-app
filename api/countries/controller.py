@@ -1,16 +1,30 @@
-from flask import Flask, request
-from flask_restful import Resource, Api, reqparse
-from countries.service import emissions
+from flask import request, send_file
+from flask_restful import Resource
+from countries.service import co2_dict, population_dict
+
 TRUTHY = ['true', 'True', 'yes']
 
 
 class Emissions(Resource):
-    def get(self, country, year):
+    def get(self, country):
         percapita = True if request.args.get('percapita') in TRUTHY else False
-        country_emissions = emissions(country, year)
-        return {'country': country, 'year': year, 'percapita': str(percapita), 'emissions': country_emissions}
+        co2_emissions = co2_dict(country)
+        return {'country': country, 'percapita': str(percapita),
+                'emissions': co2_emissions}
+
+
+class Population(Resource):
+    def get(self, country):
+        population = population_dict(country)
+        return {'country': country, 'emissions': population}
 
 
 class Example(Resource):
     def get(self, param):
         return {'result': param}
+
+
+class Picture(Resource):
+    def get(self):
+        response = send_file("cat.jpg")
+        return response
