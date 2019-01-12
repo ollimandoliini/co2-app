@@ -32,19 +32,15 @@ def co2_dict(country):
         select_country = co2_df[co2_df['Country Name'] == formatted_country]
         year_rows = select_country.iloc[:, 4:]
         year_dict = year_rows.apply(lambda x: float(x)).squeeze().to_dict()
-        co2_list = []
-        for k, v in year_dict.items():
-            co2_item = {'year': int(k), 'amount': v}
-            co2_list.append(co2_item)
+        co2_list = [{'year': int(k), 'amount': v}
+                    for k, v in year_dict.items()]
         return co2_list
     elif (co2_df['Country Code'] == country.upper()).any():
         select_country = co2_df[co2_df['Country Code'] == country.upper()]
         year_rows = select_country.iloc[:, 4:]
         year_dict = year_rows.apply(lambda x: float(x)).squeeze().to_dict()
-        co2_list = []
-        for k, v in year_dict.items():
-            co2_item = {'year': int(k), 'amount': v}
-            co2_list.append(co2_item)
+        co2_list = [{'year': int(k), 'amount': v}
+                    for k, v in year_dict.items()]
         return co2_list
     else:
         return
@@ -57,20 +53,16 @@ def population_dict(country):
                                        == formatted_country]
         year_rows = select_country.iloc[:, 4:]
         year_dict = year_rows.apply(lambda x: int(x)).squeeze().to_dict()
-        population_list = []
-        for k, v in year_dict.items():
-            population_item = {'year': int(k), 'amount': v}
-            population_list.append(population_item)
+        population_list = [{'year': int(k), 'amount': v}
+                           for k, v in year_dict.items()]
         return population_list
     elif (population_df['Country Code'] == country.upper()).any():
         select_country = population_df[population_df['Country Code']
                                        == country.upper()]
         year_rows = select_country.iloc[:, 4:]
         year_dict = year_rows.apply(lambda x: int(x)).squeeze().to_dict()
-        population_list = []
-        for k, v in year_dict.items():
-            population_item = {'year': int(k), 'amount': v}
-            population_list.append(population_item)
+        population_list = [{'year': int(k), 'amount': v}
+                           for k, v in year_dict.items()]
         return population_list
     else:
         return

@@ -16,7 +16,7 @@ class Emissions(Resource):
 class Population(Resource):
     def get(self, country):
         population = population_dict(country)
-        return {'country': country, 'emissions': population}
+        return {'country': country, 'population': population}
 
 
 class Example(Resource):
