@@ -1,22 +1,20 @@
-from flask import request, send_file
+from flask import send_file
 from flask_restful import Resource
-from countries.service import co2_dict, population_dict
-
-TRUTHY = ['true', 'True', 'yes']
+from countries.service import country_data, country_plot
 
 
-class Emissions(Resource):
+class Country(Resource):
     def get(self, country):
-        percapita = True if request.args.get('percapita') in TRUTHY else False
-        co2_emissions = co2_dict(country)
-        return {'country': country, 'percapita': str(percapita),
-                'emissions': co2_emissions}
+        data = country_data(country)
+        return {'country': country.title(), 'years': data}
 
 
-class Population(Resource):
+class CountryPlot(Resource):
     def get(self, country):
-        population = population_dict(country)
-        return {'country': country, 'population': population}
+        plot = country_plot(country)
+        plot.seek(0)
+        file = send_file(plot, mimetype='image/png')
+        return file
 
 
 class Example(Resource):

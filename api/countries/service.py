@@ -1,68 +1,49 @@
 import pandas as pd
+import matplotlib as mpl
+import io
+mpl.use('TkAgg')
+import matplotlib.pyplot as plt  # NOQA
 
-co2_df = pd.read_csv('./data/emissions.csv',
-                     header=0, error_bad_lines=False, sep=";")
+
+co2_df = pd.read_csv('./data/emissions.csv', header=0,
+                     error_bad_lines=False, sep=";")
 population_df = pd.read_csv('./data/population.csv',
                             header=0, error_bad_lines=False, sep=";")
 
 
-# df_emissions.columns = df_emissions.columns.str.lower()
-# population_df.columns = population_df.columns.str.lower()
-
-
-def population(country, year):
-    row = population_df[population_df['Country Name'] == country]
-    return float(row[str(year)].values[0])
-
-
-# def emissions(country, year=''):
-#     if year:
-#         row = df_emissions[df_emissions['Country Name'] == country]
-#         return float(row[str(year)].values[0])
-
-
-# def emissions_per_capita(country, year):
-#     per_capita = emissions(country, year) / population(country, year)
-#     return per_capita
-
-
-def co2_dict(country):
+def country_data(country):
     formatted_country = country.title()
     if (co2_df['Country Name'] == formatted_country).any():
         select_country = co2_df[co2_df['Country Name'] == formatted_country]
-        year_rows = select_country.iloc[:, 4:]
-        year_dict = year_rows.apply(lambda x: float(x)).squeeze().to_dict()
-        co2_list = [{'year': int(k), 'amount': v}
-                    for k, v in year_dict.items()]
-        return co2_list
-    elif (co2_df['Country Code'] == country.upper()).any():
-        select_country = co2_df[co2_df['Country Code'] == country.upper()]
-        year_rows = select_country.iloc[:, 4:]
-        year_dict = year_rows.apply(lambda x: float(x)).squeeze().to_dict()
-        co2_list = [{'year': int(k), 'amount': v}
-                    for k, v in year_dict.items()]
-        return co2_list
-    else:
-        return
-
-
-def population_dict(country):
-    formatted_country = country.title()
+        year_columns = select_country.iloc[:, 4:]
+        co2_dict = year_columns.apply(lambda x: float(x)).squeeze().to_dict()
     if (population_df['Country Name'] == formatted_country).any():
         select_country = population_df[population_df['Country Name']
                                        == formatted_country]
-        year_rows = select_country.iloc[:, 4:]
-        year_dict = year_rows.apply(lambda x: int(x)).squeeze().to_dict()
-        population_list = [{'year': int(k), 'amount': v}
-                           for k, v in year_dict.items()]
-        return population_list
-    elif (population_df['Country Code'] == country.upper()).any():
-        select_country = population_df[population_df['Country Code']
-                                       == country.upper()]
-        year_rows = select_country.iloc[:, 4:]
-        year_dict = year_rows.apply(lambda x: int(x)).squeeze().to_dict()
-        population_list = [{'year': int(k), 'amount': v}
-                           for k, v in year_dict.items()]
-        return population_list
+        year_columns = select_country.iloc[:, 4:]
+        population_dict = year_columns.apply(
+            lambda x: int(x)).squeeze().to_dict()
+
+    combined_data = []
+    for k, v in co2_dict.items():
+        metric_tons_per_capita = v / population_dict[k] * 1000
+        dict_item = {'year': k, 'co2_kilotons': v,
+                     'population': population_dict[k],
+                     'co2_per_capita': metric_tons_per_capita}
+        combined_data.append(dict_item)
+    return combined_data
+
+
+def country_plot(country, percapita=False):
+    data = country_data(country)
+    years = [i['year'] for i in data]
+    if percapita:
+        dataset = [i['metric_tons_per_capita'] for i in data]
     else:
-        return
+        dataset = [i['co2_kilotons'] for i in data]
+    plt.figure(figsize=(8, 14))
+    plt.barh(range(len(dataset)), dataset, align='center', color='black')
+    plt.yticks(range(len(years)), years)
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    return buf

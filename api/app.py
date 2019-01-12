@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Api
-from countries.controller import Emissions, Population, Example, Picture
+from countries.controller import Example, Picture, Country, CountryPlot
 
 app = Flask(__name__)
 api = Api(app)
@@ -16,10 +16,10 @@ def after_request(response):
     return response
 
 
-api.add_resource(Emissions, '/countries/<country>/emissions/')
-api.add_resource(Population, '/countries/<country>/population/')
+api.add_resource(Country, '/countries/<country>/')
+api.add_resource(CountryPlot, '/countries/<country>.png')
 api.add_resource(Example, '/<param>')
 api.add_resource(Picture, '/picture')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

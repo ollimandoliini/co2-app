@@ -109,7 +109,7 @@ showResult model =
             div
                 [ class "result" ]
                 [ text output
-                , img [ src "//127.0.0.1:5000/picture" ] []
+                , img [ src ("//127.0.0.1:5000/countries/" ++ output ++ ".png") ] []
                 ]
 
         Initial ->
