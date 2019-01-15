@@ -5,7 +5,7 @@ import Html exposing (Attribute, Html, button, div, form, h1, img, input, label,
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import Json.Decode exposing (Decoder, field, string)
+import Json.Decode as JD exposing (Decoder, field, float, int, string)
 
 
 
@@ -28,20 +28,33 @@ main =
 type LoadingStatus
     = Failure
     | Loading
-    | Success String
+    | Success Response
     | Initial
+
+
+type alias Response =
+    { country : String
+    , dataPoints : List DataPoint
+    }
+
+
+type alias DataPoint =
+    { year : Int
+    , co2_kilotons : Maybe Float
+    , population : Int
+    , co2_per_capita : Maybe Float
+    }
 
 
 type alias Model =
     { loaded : LoadingStatus
     , country : String
-    , year : Int
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { loaded = Initial, country = "", year = 0 }, Cmd.none )
+    ( { loaded = Initial, country = "" }, Cmd.none )
 
 
 
@@ -51,14 +64,14 @@ init _ =
 type Msg
     = Search
     | Change String
-    | ResultReceived (Result Http.Error String)
+    | ResultReceived (Result Http.Error Response)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Search ->
-            ( { model | loaded = Loading }, getEmissionsbyCountry model.country model.year )
+            ( { model | loaded = Loading }, getEmissionsbyCountry model.country )
 
         ResultReceived result ->
             case result of
@@ -91,7 +104,6 @@ view model =
         [ h1 [ class "title" ] [ text "CO2-emissions" ]
         , input [ placeholder "Search by country", value model.country, onInput Change ] []
         , button [ onClick Search ] [ text "Search" ]
-        , label [] [ input [ type_ "checkbox" ] [], text "Per Capita" ]
         , showResult model.loaded
         ]
 
@@ -108,9 +120,7 @@ showResult model =
         Success output ->
             div
                 [ class "result" ]
-                [ text output
-                , img [ src ("//127.0.0.1:5000/countries/" ++ output ++ ".png") ] []
-                ]
+                [ text output.country ]
 
         Initial ->
             div [ class "result" ] []
@@ -120,14 +130,30 @@ showResult model =
 -- HTTP
 
 
-getEmissionsbyCountry : String -> Int -> Cmd Msg
-getEmissionsbyCountry country year =
+getEmissionsbyCountry : String -> Cmd Msg
+getEmissionsbyCountry country =
     Http.get
-        { url = "http://127.0.0.1:5000/" ++ country
+        { url = "http://127.0.0.1:5000/countries/" ++ country
         , expect = Http.expectJson ResultReceived responseDecoder
         }
 
 
-responseDecoder : Decoder String
+responseDecoder : Decoder Response
 responseDecoder =
-    field "result" string
+    JD.map2 Response
+        (JD.field "country" JD.string)
+        (JD.field "dataPoints" datapointlistDecoder)
+
+
+datapointlistDecoder : Decoder (List DataPoint)
+datapointlistDecoder =
+    JD.list datapointDecoder
+
+
+datapointDecoder : Decoder DataPoint
+datapointDecoder =
+    JD.map4 DataPoint
+        (JD.field "year" int)
+        (JD.maybe (JD.field "co2_kilotons" JD.float))
+        (JD.field "population" int)
+        (JD.maybe (JD.field "co2_per_capita" JD.float))
