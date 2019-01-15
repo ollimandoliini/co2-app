@@ -7,7 +7,7 @@ name = "pypi"
 pandas = "*"
 flask-restful = "*"
 matplotlib = "*"
-simplejson = "*"
+gunicorn = "*"
 
 [dev-packages]
 
