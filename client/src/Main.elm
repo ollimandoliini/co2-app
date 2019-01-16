@@ -25,6 +25,10 @@ main =
 -- MODEL
 
 
+type alias Flags =
+    { apiUrl : String, environment : String }
+
+
 type LoadingStatus
     = Failure
     | Loading
@@ -49,12 +53,13 @@ type alias DataPoint =
 type alias Model =
     { loaded : LoadingStatus
     , country : String
+    , envs : Flags
     }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( { loaded = Initial, country = "" }, Cmd.none )
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    ( { loaded = Initial, country = "", envs = flags }, Cmd.none )
 
 
 
@@ -71,7 +76,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Search ->
-            ( { model | loaded = Loading }, getEmissionsbyCountry model.country )
+            ( { model | loaded = Loading }, getEmissionsbyCountry model.country model.envs )
 
         ResultReceived result ->
             case result of
@@ -130,10 +135,10 @@ showResult model =
 -- HTTP
 
 
-getEmissionsbyCountry : String -> Cmd Msg
-getEmissionsbyCountry country =
+getEmissionsbyCountry : String -> Flags -> Cmd Msg
+getEmissionsbyCountry country flags =
     Http.get
-        { url = "http://127.0.0.1:5000/countries/" ++ country
+        { url = flags.apiUrl ++ "countries/" ++ country
         , expect = Http.expectJson ResultReceived responseDecoder
         }
 
