@@ -1,7 +1,7 @@
 module Main exposing (LoadingStatus(..), Model, Msg(..), getEmissionsbyCountry, init, main, responseDecoder, showResult, subscriptions, update, view)
 
 import Browser
-import Html exposing (Attribute, Html, button, div, form, h1, img, input, label, text)
+import Html exposing (Attribute, Html, button, div, form, h1, img, input, label, table, tbody, text, th, thead, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
@@ -44,22 +44,22 @@ type alias Response =
 
 type alias DataPoint =
     { year : Int
-    , co2_kilotons : Maybe Float
+    , co2_kilotons : Float
     , population : Int
-    , co2_per_capita : Maybe Float
+    , co2_per_capita : Float
     }
 
 
 type alias Model =
     { loaded : LoadingStatus
-    , country : String
+    , keyword : String
     , envs : Flags
     }
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { loaded = Initial, country = "", envs = flags }, Cmd.none )
+    ( { loaded = Initial, keyword = "", envs = flags }, Cmd.none )
 
 
 
@@ -76,7 +76,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Search ->
-            ( { model | loaded = Loading }, getEmissionsbyCountry model.country model.envs )
+            ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
 
         ResultReceived result ->
             case result of
@@ -87,7 +87,7 @@ update msg model =
                     ( { model | loaded = Failure }, Cmd.none )
 
         Change newContent ->
-            ( { model | country = newContent }, Cmd.none )
+            ( { model | keyword = newContent }, Cmd.none )
 
 
 
@@ -107,7 +107,7 @@ view : Model -> Html Msg
 view model =
     div [ class "main-wrap" ]
         [ h1 [ class "title" ] [ text "CO2-emissions" ]
-        , input [ placeholder "Search by country", value model.country, onInput Change ] []
+        , input [ placeholder "Search by country", value model.keyword, onInput Change ] []
         , button [ onClick Search ] [ text "Search" ]
         , showResult model.loaded
         ]
@@ -125,20 +125,50 @@ showResult model =
         Success output ->
             div
                 [ class "result" ]
-                [ text output.country ]
+                [ text output.country
+                , listDatapoints output.dataPoints
+                ]
 
         Initial ->
             div [ class "result" ] []
 
 
+listDatapoints : List DataPoint -> Html Msg
+listDatapoints datapoints =
+    div [ class "p2" ]
+        [ table []
+            [ thead []
+                [ tr []
+                    [ th [] [ text "Year" ]
+                    , th [] [ text "CO2" ]
+                    , th [] [ text "Population" ]
+                    , th [] [ text "Metric Tons Per Capita" ]
+                    ]
+                ]
+            , tbody [] (List.map datapointRow (List.reverse datapoints))
+            ]
+        ]
 
+
+datapointRow : DataPoint -> Html Msg
+datapointRow datapoint =
+    tr []
+        [ th [] [ text (String.fromInt datapoint.year) ]
+        , th [] [ text (String.fromFloat datapoint.co2_kilotons) ]
+        , th [] [ text (String.fromInt datapoint.population) ]
+        , th [] [ text (String.fromFloat datapoint.co2_per_capita) ]
+        ]
+
+
+
+-- datapointsList :
 -- HTTP
 
 
 getEmissionsbyCountry : String -> Flags -> Cmd Msg
-getEmissionsbyCountry country flags =
+getEmissionsbyCountry keyword flags =
     Http.get
-        { url = flags.apiUrl ++ "countries/" ++ country
+        { url = flags.apiUrl ++ "countries/" ++ keyword
         , expect = Http.expectJson ResultReceived responseDecoder
         }
 
@@ -159,6 +189,6 @@ datapointDecoder : Decoder DataPoint
 datapointDecoder =
     JD.map4 DataPoint
         (JD.field "year" int)
-        (JD.maybe (JD.field "co2_kilotons" JD.float))
+        (JD.field "co2_kilotons" float)
         (JD.field "population" int)
-        (JD.maybe (JD.field "co2_per_capita" JD.float))
+        (JD.field "co2_per_capita" float)
