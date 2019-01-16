@@ -1,11 +1,13 @@
 module Main exposing (LoadingStatus(..), Model, Msg(..), getEmissionsbyCountry, init, main, responseDecoder, showResult, subscriptions, update, view)
 
 import Browser
+import Graph exposing (plot)
 import Html exposing (Attribute, Html, button, div, form, h1, img, input, label, table, tbody, text, th, thead, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode as JD exposing (Decoder, field, float, int, string)
+import Models exposing (Datapoint, Response)
 
 
 
@@ -34,20 +36,6 @@ type LoadingStatus
     | Loading
     | Success Response
     | Initial
-
-
-type alias Response =
-    { country : String
-    , dataPoints : List DataPoint
-    }
-
-
-type alias DataPoint =
-    { year : Int
-    , co2_kilotons : Float
-    , population : Int
-    , co2_per_capita : Float
-    }
 
 
 type alias Model =
@@ -126,14 +114,16 @@ showResult model =
             div
                 [ class "result" ]
                 [ text output.country
-                , listDatapoints output.dataPoints
+
+                -- , listDatapoints output.dataPoints
+                , Graph.plot output
                 ]
 
         Initial ->
             div [ class "result" ] []
 
 
-listDatapoints : List DataPoint -> Html Msg
+listDatapoints : List Datapoint -> Html Msg
 listDatapoints datapoints =
     div [ class "p2" ]
         [ table []
@@ -150,10 +140,10 @@ listDatapoints datapoints =
         ]
 
 
-datapointRow : DataPoint -> Html Msg
+datapointRow : Datapoint -> Html Msg
 datapointRow datapoint =
     tr []
-        [ th [] [ text (String.fromInt datapoint.year) ]
+        [ th [] [ text (String.fromFloat datapoint.year) ]
         , th [] [ text (String.fromFloat datapoint.co2_kilotons) ]
         , th [] [ text (String.fromInt datapoint.population) ]
         , th [] [ text (String.fromFloat datapoint.co2_per_capita) ]
@@ -180,15 +170,15 @@ responseDecoder =
         (JD.field "dataPoints" datapointlistDecoder)
 
 
-datapointlistDecoder : Decoder (List DataPoint)
+datapointlistDecoder : Decoder (List Datapoint)
 datapointlistDecoder =
     JD.list datapointDecoder
 
 
-datapointDecoder : Decoder DataPoint
+datapointDecoder : Decoder Datapoint
 datapointDecoder =
-    JD.map4 DataPoint
-        (JD.field "year" int)
+    JD.map4 Datapoint
+        (JD.field "year" float)
         (JD.field "co2_kilotons" float)
         (JD.field "population" int)
         (JD.field "co2_per_capita" float)
