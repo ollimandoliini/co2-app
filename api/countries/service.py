@@ -15,6 +15,11 @@ co2_df.fillna(value=0, inplace=True)
 population_df.fillna(value=0, inplace=True)
 
 
+def get_country_names():
+    names = co2_df['Country Name'].squeeze().tolist()
+    return names
+
+
 def get_country_data(country):
 
     formatted_country = country.title()

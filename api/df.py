@@ -13,8 +13,6 @@ population_df = pd.read_csv('./data/population.csv',
 # co2_df.fillna(value=0, inplace=True)
 # population_df.fillna(value=0, inplace=True)
 
-print(co2_df)
-
 
 def country_data(country):
     formatted_country = country.title()
@@ -62,6 +60,11 @@ def country_plot(country, percapita=True):
         buf = io.BytesIO()
         plt.savefig(buf, format='png')
         return buf
+
+
+def get_country_names():
+    names = co2_df['Country Name'].squeeze().tolist()
+    return names
 
 
 # country_data_dict = country_data('sweden')

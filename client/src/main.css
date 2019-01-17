@@ -17,3 +17,11 @@ body {
 h1 {
   color: red;
 }
+
+.plot-container {
+  cursor: pointer;
+}
+
+.country-item {
+  cursor: pointer;
+}
