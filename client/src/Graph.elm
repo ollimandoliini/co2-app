@@ -15,17 +15,17 @@ import LineChart.Interpolation as Interpolation
 import LineChart.Junk as Junk exposing (..)
 import LineChart.Legends as Legends
 import LineChart.Line as Line
-import Models exposing (Datapoint, Response)
+import Models exposing (CountryData, Datapoint)
 
 
-plot : Response -> Html.Html msg
+plot : List CountryData -> Html.Html msg
 plot data =
     Html.div
         [ class "container" ]
         [ chart data ]
 
 
-chart : Response -> Html.Html msg
+chart : List CountryData -> Html.Html msg
 chart data =
     LineChart.viewCustom
         { y = Axis.default 450 "CO2" .co2_per_capita
@@ -49,7 +49,10 @@ chart data =
         -- customConfig
         -- For making the dots change based on whether it's hovered, see Events.elm!
         }
-        [ LineChart.line Colors.red Dots.diamond data.country data.dataPoints ]
+        (List.map
+            (\item -> LineChart.line Colors.red Dots.diamond item.country item.dataPoints)
+            data
+        )
 
 
 

@@ -1,4 +1,4 @@
-module Models exposing (Datapoint, Response)
+module Models exposing (CountryData, Datapoint)
 
 
 type alias Datapoint =
@@ -9,7 +9,7 @@ type alias Datapoint =
     }
 
 
-type alias Response =
+type alias CountryData =
     { country : String
     , dataPoints : List Datapoint
     }
