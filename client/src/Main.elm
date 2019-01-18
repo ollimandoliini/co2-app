@@ -166,8 +166,11 @@ view : Model -> Html Msg
 view model =
     div [ class "main-wrap" ]
         [ h1 [ class "title" ] [ text "CO2-emissions" ]
-        , input [ placeholder "Finland", onKeyDown KeyDown, onInput Change, value model.keyword ] []
-        , button [ onClick SearchAndAdd ] [ text "Add" ]
+        , div [ class "search" ]
+            [ input [ class "searchField", placeholder "Finland", onKeyDown KeyDown, onInput Change, value model.keyword ] []
+            , button [ class "searchButton", onClick SearchAndAdd ] [ text "Add" ]
+            , listCountries model.countries
+            ]
         , showResult model
         ]
 
@@ -189,8 +192,7 @@ showResult model =
         Success output ->
             div
                 [ class "result" ]
-                [ listCountries model.countries
-                , plot model.countries model.percapita
+                [ plot model.countries model.percapita
                 ]
 
         Initial ->
@@ -199,7 +201,7 @@ showResult model =
 
 listCountries : List CountryData -> Html Msg
 listCountries countrieslist =
-    ul [] (List.map countryItem countrieslist)
+    ul [ class "country-list" ] (List.map countryItem countrieslist)
 
 
 countryItem : CountryData -> Html Msg
@@ -282,7 +284,7 @@ chart data percapita =
                     .co2_kilotons
                 )
         , x = Axis.default 700 "Year" .year
-        , container = Container.styled "line-chart-1" [ ( "font-family", "monospace" ) ]
+        , container = Container.styled "line-chart-1" [ ( "font-family", "Helvetica" ) ]
         , interpolation = Interpolation.default
         , intersection = Intersection.default
         , legends = Legends.default
