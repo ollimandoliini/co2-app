@@ -4,29 +4,42 @@ import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt  # NOQA
 
-co2_df = pd.read_csv("./data/emissions.csv", header=0,
-                     error_bad_lines=False, sep=";")
 
-population_df = pd.read_csv('./data/population.csv',
-                            header=0, error_bad_lines=False, sep=";")
+def read_and_format():
+    co2_df = pd.read_csv("./data/emissions.csv", header=0,
+                         error_bad_lines=False, sep=";")
 
-# co2_df.fillna(value=0, inplace=True)
-# population_df.fillna(value=0, inplace=True)
+    population_df = pd.read_csv('./data/population.csv',
+                                header=0, error_bad_lines=False, sep=";")
+
+    co2_df.fillna(value=0, inplace=True)
+    population_df.fillna(value=0, inplace=True)
+
+    co2_countrynames_lowercase = co2_df['Country Name'].apply(
+        lambda x: x.lower())
+    co2_df.insert(loc=0, column='Country Name Lowercase',
+                  value=co2_countrynames_lowercase)
+
+    population_countrynames_lowercase = population_df['Country Name'].apply(
+        lambda x: x.lower())
+    population_df.insert(loc=0, column='Country Name Lowercase',
+                         value=population_countrynames_lowercase)
 
 
-def country_data(country):
-    formatted_country = country.title()
+def get_country_data(country):
+    formatted_country = country.lower()
     co2_dict = {}
     population_dict = {}
 
-    if (co2_df['Country Name'] == formatted_country).any():
-        select_country = co2_df[co2_df['Country Name'] == formatted_country]
-        year_columns = select_country.iloc[:, 4:]
+    if (co2_df['Country Name Lowercase'] == formatted_country).any():
+        select_country = co2_df[co2_df['Country Name Lowercase']
+                                == formatted_country]
+        year_columns = select_country.iloc[:, 5:]
         co2_dict = year_columns.apply(lambda x: float(x)).squeeze().to_dict()
-    if (population_df['Country Name'] == formatted_country).any():
-        select_country = population_df[population_df['Country Name']
+    if (population_df['Country Name Lowercase'] == formatted_country).any():
+        select_country = population_df[population_df['Country Name Lowercase']
                                        == formatted_country]
-        year_columns = select_country.iloc[:, 4:]
+        year_columns = select_country.iloc[:, 5:]
         population_dict = year_columns.apply(
             lambda x: int(x)).squeeze().to_dict()
 
@@ -42,8 +55,8 @@ def country_data(country):
     return combined_data
 
 
-def country_plot(country, percapita=True):
-    data = country_data(country)
+def get_country_plot(country, percapita=True):
+    data = get_country_data(country)
     years = [i['year'] for i in data]
     if percapita:
         percapita_list = [i['metric_tons_per_capita'] for i in data]
@@ -66,6 +79,8 @@ def get_country_names():
     names = co2_df['Country Name'].squeeze().tolist()
     return names
 
+
+print(get_country_data('FINLAND'))
 
 # country_data_dict = country_data('sweden')
 

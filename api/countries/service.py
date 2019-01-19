@@ -5,14 +5,24 @@ from flask import send_file, abort
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt  # NOQA
 
-
-co2_df = pd.read_csv('./data/emissions.csv', header=0,
+co2_df = pd.read_csv("./data/emissions.csv", header=0,
                      error_bad_lines=False, sep=";")
+
 population_df = pd.read_csv('./data/population.csv',
                             header=0, error_bad_lines=False, sep=";")
 
 co2_df.fillna(value=0, inplace=True)
 population_df.fillna(value=0, inplace=True)
+
+co2_countrynames_lowercase = co2_df['Country Name'].apply(
+    lambda x: x.lower())
+co2_df.insert(loc=0, column='Country Name Lowercase',
+              value=co2_countrynames_lowercase)
+
+population_countrynames_lowercase = population_df['Country Name'].apply(
+    lambda x: x.lower())
+population_df.insert(loc=0, column='Country Name Lowercase',
+                     value=population_countrynames_lowercase)
 
 
 def get_country_names():
@@ -22,17 +32,18 @@ def get_country_names():
 
 def get_country_data(country):
 
-    formatted_country = country.title()
-    if (co2_df['Country Name'] == formatted_country).any():
-        select_country = co2_df[co2_df['Country Name'] == formatted_country]
-        year_columns = select_country.iloc[:, 4:]
+    formatted_country = country.lower()
+    if (co2_df['Country Name Lowercase'] == formatted_country).any():
+        select_country = co2_df[co2_df['Country Name Lowercase']
+                                == formatted_country]
+        year_columns = select_country.iloc[:, 5:]
         co2_dict = year_columns.apply(lambda x: float(x)).squeeze().to_dict()
     else:
         return abort(404)
-    if (population_df['Country Name'] == formatted_country).any():
-        select_country = population_df[population_df['Country Name']
+    if (population_df['Country Name Lowercase'] == formatted_country).any():
+        select_country = population_df[population_df['Country Name Lowercase']
                                        == formatted_country]
-        year_columns = select_country.iloc[:, 4:]
+        year_columns = select_country.iloc[:, 5:]
         population_dict = year_columns.apply(
             lambda x: int(x)).squeeze().to_dict()
 

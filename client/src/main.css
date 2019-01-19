@@ -35,6 +35,8 @@ h1 {
 .search {
   width: 200px;
   position: relative;
+  /* display: inline-block; */
+  
 }
 
 .searchField {
@@ -91,6 +93,7 @@ h1 {
 
 .result {
   text-align: center;
+  display: inline-block;
 }
 
 .plot-container {

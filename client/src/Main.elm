@@ -22,6 +22,7 @@ import LineChart.Interpolation as Interpolation
 import LineChart.Junk as Junk exposing (..)
 import LineChart.Legends as Legends
 import LineChart.Line as Line
+import Plot exposing (linechart)
 
 
 
@@ -124,7 +125,7 @@ update msg model =
             ( { model | countries = removeCountry model.countries countryname }, Cmd.none )
 
         TogglePerCapita ->
-            ( { model | percapita = perCapitaToggle model.percapita }, Cmd.none )
+            ( { model | percapita = not model.percapita }, Cmd.none )
 
         KeyDown key ->
             if key == 13 then
@@ -132,15 +133,6 @@ update msg model =
 
             else
                 ( model, Cmd.none )
-
-
-perCapitaToggle : Bool -> Bool
-perCapitaToggle current =
-    if current == True then
-        False
-
-    else
-        True
 
 
 addCountryData : List CountryData -> CountryData -> List CountryData
@@ -199,6 +191,13 @@ showResult model =
             div [ class "result" ] []
 
 
+plot : List CountryData -> Bool -> Html Msg
+plot data percapita =
+    div
+        [ class "plot-container", onClick TogglePerCapita ]
+        [ linechart data percapita ]
+
+
 listCountries : List CountryData -> Html Msg
 listCountries countrieslist =
     ul [ class "country-list" ] (List.map countryItem countrieslist)
@@ -222,13 +221,8 @@ getCountryList : Flags -> Cmd Msg
 getCountryList flags =
     Http.get
         { url = flags.apiUrl ++ "countries/list/"
-        , expect = Http.expectJson CountryListReceived countrylistDecoder
+        , expect = Http.expectJson CountryListReceived (JD.list string)
         }
-
-
-countrylistDecoder : Decoder (List String)
-countrylistDecoder =
-    JD.list string
 
 
 getEmissionsbyCountry : String -> Flags -> Cmd Msg
@@ -243,70 +237,13 @@ countryDataDecoder : Decoder CountryData
 countryDataDecoder =
     JD.map2 CountryData
         (JD.field "country" JD.string)
-        (JD.field "dataPoints" datapointlistDecoder)
-
-
-datapointlistDecoder : Decoder (List Datapoint)
-datapointlistDecoder =
-    JD.list datapointDecoder
-
-
-datapointDecoder : Decoder Datapoint
-datapointDecoder =
-    JD.map4 Datapoint
-        (JD.field "year" float)
-        (JD.field "co2_kilotons" float)
-        (JD.field "population" int)
-        (JD.field "co2_per_capita" float)
-
-
-
--- PLOT
-
-
-plot : List CountryData -> Bool -> Html Msg
-plot data percapita =
-    div
-        [ class "plot-container", onClick TogglePerCapita ]
-        [ chart data percapita ]
-
-
-chart : List CountryData -> Bool -> Html.Html msg
-chart data percapita =
-    LineChart.viewCustom
-        { y =
-            Axis.default 450
-                "CO2"
-                (if percapita then
-                    .co2_per_capita
-
-                 else
-                    .co2_kilotons
+        (JD.field "dataPoints"
+            (JD.list
+                (JD.map4 Datapoint
+                    (JD.field "year" float)
+                    (JD.field "co2_kilotons" float)
+                    (JD.field "population" int)
+                    (JD.field "co2_per_capita" float)
                 )
-        , x = Axis.default 700 "Year" .year
-        , container = Container.styled "line-chart-1" [ ( "font-family", "Helvetica" ) ]
-        , interpolation = Interpolation.default
-        , intersection = Intersection.default
-        , legends = Legends.default
-        , events = Events.default
-        , junk = Junk.default
-        , grid = Grid.default
-        , area = Area.default
-        , line = Line.default
-        , dots = Dots.default
-        }
-        (List.map
-            (\item -> LineChart.line (Tuple.second item) Dots.diamond (Tuple.first item).country (Tuple.first item).dataPoints)
-            (colorTuple
-                data
             )
         )
-
-
-colorTuple : List CountryData -> List ( CountryData, Color )
-colorTuple data =
-    let
-        colors =
-            [ Colors.blue, Colors.red, Colors.green, Colors.gold, Colors.purple, Colors.pink ]
-    in
-    List.map2 Tuple.pair data colors
