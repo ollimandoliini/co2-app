@@ -1,4 +1,4 @@
-module Main exposing (LoadingStatus(..), Model, Msg(..), countryDataDecoder, getEmissionsbyCountry, init, main, showResult, subscriptions, update, view)
+module Main exposing (Msg(..), countryDataDecoder, getEmissionsbyCountry, init, main, showResult, subscriptions, update, view)
 
 import Array
 import Browser
@@ -9,19 +9,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode as JD exposing (Decoder, field, float, int, string)
-import LineChart
-import LineChart.Area as Area
-import LineChart.Axis as Axis
-import LineChart.Axis.Intersection as Intersection
-import LineChart.Colors as Colors
-import LineChart.Container as Container
-import LineChart.Dots as Dots
-import LineChart.Events as Events
-import LineChart.Grid as Grid
-import LineChart.Interpolation as Interpolation
-import LineChart.Junk as Junk exposing (..)
-import LineChart.Legends as Legends
-import LineChart.Line as Line
+import Menu
+import Model exposing (..)
 import Plot exposing (linechart)
 
 
@@ -42,41 +31,6 @@ main =
 -- MODEL
 
 
-type alias Flags =
-    { apiUrl : String, environment : String }
-
-
-type LoadingStatus
-    = Failure
-    | Loading
-    | Success CountryData
-    | Initial
-
-
-type alias Model =
-    { loaded : LoadingStatus
-    , keyword : String
-    , envs : Flags
-    , countries : List CountryData
-    , percapita : Bool
-    , countrylist : List String
-    }
-
-
-type alias Datapoint =
-    { year : Float
-    , co2_kilotons : Float
-    , population : Int
-    , co2_per_capita : Float
-    }
-
-
-type alias CountryData =
-    { country : String
-    , dataPoints : List Datapoint
-    }
-
-
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { loaded = Initial, keyword = "", envs = flags, countries = [], percapita = False, countrylist = [] }, Cmd.batch [ getEmissionsbyCountry "Finland" flags, getCountryList flags ] )
@@ -87,13 +41,13 @@ init flags =
 
 
 type Msg
-    = SearchAndAdd
+    = CountryListReceived (Result Http.Error (List String))
     | Change String
+    | KeyDown Int
+    | SearchAndAdd
     | ResultReceived (Result Http.Error CountryData)
-    | CountryListReceived (Result Http.Error (List String))
     | RemoveCountry String
     | TogglePerCapita
-    | KeyDown Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -107,6 +61,19 @@ update msg model =
                 Err _ ->
                     ( model, Cmd.none )
 
+        Change newContent ->
+            ( { model | keyword = newContent }, Cmd.none )
+
+        SearchAndAdd ->
+            ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
+
+        KeyDown key ->
+            if key == 13 then
+                ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
+
+            else
+                ( model, Cmd.none )
+
         ResultReceived result ->
             case result of
                 Ok output ->
@@ -115,24 +82,11 @@ update msg model =
                 Err _ ->
                     ( { model | loaded = Failure }, Cmd.none )
 
-        Change newContent ->
-            ( { model | keyword = newContent }, Cmd.none )
-
-        SearchAndAdd ->
-            ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
-
         RemoveCountry countryname ->
             ( { model | countries = removeCountry model.countries countryname }, Cmd.none )
 
         TogglePerCapita ->
             ( { model | percapita = not model.percapita }, Cmd.none )
-
-        KeyDown key ->
-            if key == 13 then
-                ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
-
-            else
-                ( model, Cmd.none )
 
 
 addCountryData : List CountryData -> CountryData -> List CountryData
@@ -176,7 +130,10 @@ showResult : Model -> Html Msg
 showResult model =
     case model.loaded of
         Failure ->
-            div [ class "result" ] [ text "Failure" ]
+            div [ class "result" ]
+                [ text "Country not found"
+                , plot model.countries model.percapita
+                ]
 
         Loading ->
             div [ class "result" ] [ text "Loading..." ]
@@ -237,13 +194,11 @@ countryDataDecoder : Decoder CountryData
 countryDataDecoder =
     JD.map2 CountryData
         (JD.field "country" JD.string)
-        (JD.field "dataPoints"
-            (JD.list
-                (JD.map4 Datapoint
+    <|
+        JD.field "dataPoints" <|
+            JD.list <|
+                JD.map4 Datapoint
                     (JD.field "year" float)
                     (JD.field "co2_kilotons" float)
                     (JD.field "population" int)
                     (JD.field "co2_per_capita" float)
-                )
-            )
-        )

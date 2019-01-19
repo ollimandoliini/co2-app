@@ -5,24 +5,6 @@ import Json.Decode as JD exposing (Decoder, field, float, int, string)
 import Menu
 
 
-type alias Model =
-    { loaded : LoadingStatus
-    , query : String
-    , envs : Flags
-    , countries : List CountryData
-    , percapita : Bool
-    , countryList : List CountryName
-    , autoState : Menu.State
-    , showMenu : Bool
-    , selectedCountry : Maybe String
-    , howManyToShow : Int
-    }
-
-
-type alias CountryName =
-    { name : String }
-
-
 type alias Flags =
     { apiUrl : String, environment : String }
 
@@ -32,6 +14,16 @@ type LoadingStatus
     | Loading
     | Success CountryData
     | Initial
+
+
+type alias Model =
+    { loaded : LoadingStatus
+    , keyword : String
+    , envs : Flags
+    , countries : List CountryData
+    , percapita : Bool
+    , countrylist : List String
+    }
 
 
 type alias Datapoint =
