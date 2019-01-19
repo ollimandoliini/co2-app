@@ -33,7 +33,19 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { loaded = Initial, keyword = "", envs = flags, countries = [], percapita = False, countrylist = [] }, Cmd.batch [ getEmissionsbyCountry "Finland" flags, getCountryList flags ] )
+    ( { loaded = Initial
+      , keyword = ""
+      , envs = flags
+      , countries = []
+      , percapita = False
+      , countrylist = []
+      , autoState = Menu.empty
+      , howManyToShow = 5
+      , selectedCountry = Nothing
+      , showMenu = False
+      }
+    , Cmd.batch [ getEmissionsbyCountry "Finland" flags, getCountryList flags ]
+    )
 
 
 
@@ -65,11 +77,19 @@ update msg model =
             ( { model | keyword = newContent }, Cmd.none )
 
         SearchAndAdd ->
-            ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
+            if String.length model.keyword > 0 then
+                ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
+
+            else
+                ( model, Cmd.none )
 
         KeyDown key ->
             if key == 13 then
-                ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
+                if String.length model.keyword > 0 then
+                    ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
+
+                else
+                    ( model, Cmd.none )
 
             else
                 ( model, Cmd.none )
@@ -91,8 +111,11 @@ update msg model =
 
 addCountryData : List CountryData -> CountryData -> List CountryData
 addCountryData oldList countrydataitem =
-    -- countrydataitem :: oldList
-    List.append oldList [ countrydataitem ]
+    if not (List.member countrydataitem oldList) then
+        List.append oldList [ countrydataitem ]
+
+    else
+        oldList
 
 
 

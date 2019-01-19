@@ -23,6 +23,10 @@ type alias Model =
     , countries : List CountryData
     , percapita : Bool
     , countrylist : List String
+    , autoState : Menu.State
+    , howManyToShow : Int
+    , selectedCountry : Maybe String
+    , showMenu : Bool
     }
 
 
