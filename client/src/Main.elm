@@ -13,7 +13,6 @@ import List.Extra exposing (uniqueBy)
 import Menu
 import Model exposing (..)
 import Plot exposing (linechart)
-import Set
 
 
 
@@ -107,7 +106,7 @@ addCountryData : List CountryData -> CountryData -> List CountryData
 addCountryData oldList countrydataitem =
     oldList
         |> List.append [ countrydataitem ]
-        |> List.Extra.uniqueBy (\obj -> obj.country)
+        |> List.Extra.uniqueBy .country
 
 
 filterEmptyDataPoints : CountryData -> CountryData
