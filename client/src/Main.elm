@@ -9,9 +9,11 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode as JD exposing (Decoder, field, float, int, string)
+import List.Extra exposing (uniqueBy)
 import Menu
 import Model exposing (..)
 import Plot exposing (linechart)
+import Set
 
 
 
@@ -39,12 +41,8 @@ init flags =
       , countries = []
       , percapita = False
       , countrylist = []
-      , autoState = Menu.empty
-      , howManyToShow = 5
-      , selectedCountry = Nothing
-      , showMenu = False
       }
-    , Cmd.batch [ getEmissionsbyCountry "Finland" flags, getCountryList flags ]
+    , Cmd.batch [ getEmissionsbyCountry "Finland" flags, getEmissionsbyCountry "India" flags, getCountryList flags ]
     )
 
 
@@ -84,12 +82,8 @@ update msg model =
                 ( model, Cmd.none )
 
         KeyDown key ->
-            if key == 13 then
-                if String.length model.keyword > 0 then
-                    ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
-
-                else
-                    ( model, Cmd.none )
+            if key == 13 && String.length model.keyword > 0 then
+                ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
 
             else
                 ( model, Cmd.none )
@@ -111,11 +105,19 @@ update msg model =
 
 addCountryData : List CountryData -> CountryData -> List CountryData
 addCountryData oldList countrydataitem =
-    if not (List.member countrydataitem oldList) then
-        List.append oldList [ countrydataitem ]
+    oldList
+        |> List.append [ countrydataitem ]
+        |> List.Extra.uniqueBy (\obj -> obj.country)
 
-    else
-        oldList
+
+filterEmptyDataPoints : CountryData -> CountryData
+filterEmptyDataPoints country =
+    { country | dataPoints = removeZeros country.dataPoints }
+
+
+removeZeros : List Datapoint -> List Datapoint
+removeZeros oldList =
+    List.filter (\item -> item.co2_kilotons > 0) oldList
 
 
 
@@ -136,7 +138,7 @@ view model =
     div [ class "main-wrap" ]
         [ h1 [ class "title" ] [ text "CO2-emissions" ]
         , div [ class "search" ]
-            [ input [ class "searchField", placeholder "Finland", onKeyDown KeyDown, onInput Change, value model.keyword ] []
+            [ input [ class "searchField", placeholder "e.g.  Finland", onKeyDown KeyDown, onInput Change, value model.keyword ] []
             , button [ class "searchButton", onClick SearchAndAdd ] [ text "Add" ]
             , listCountries model.countries
             ]
@@ -217,11 +219,14 @@ countryDataDecoder : Decoder CountryData
 countryDataDecoder =
     JD.map2 CountryData
         (JD.field "country" JD.string)
-    <|
-        JD.field "dataPoints" <|
-            JD.list <|
-                JD.map4 Datapoint
+        (JD.field "dataPoints"
+            (JD.list
+                (JD.map4
+                    Datapoint
                     (JD.field "year" float)
                     (JD.field "co2_kilotons" float)
                     (JD.field "population" int)
                     (JD.field "co2_per_capita" float)
+                )
+            )
+        )

@@ -23,10 +23,12 @@ type alias Model =
     , countries : List CountryData
     , percapita : Bool
     , countrylist : List String
-    , autoState : Menu.State
-    , howManyToShow : Int
-    , selectedCountry : Maybe String
-    , showMenu : Bool
+    }
+
+
+type alias CountryData =
+    { country : String
+    , dataPoints : List Datapoint
     }
 
 
@@ -35,10 +37,4 @@ type alias Datapoint =
     , co2_kilotons : Float
     , population : Int
     , co2_per_capita : Float
-    }
-
-
-type alias CountryData =
-    { country : String
-    , dataPoints : List Datapoint
     }

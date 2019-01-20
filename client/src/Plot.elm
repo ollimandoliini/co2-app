@@ -15,7 +15,7 @@ import LineChart.Interpolation as Interpolation
 import LineChart.Junk as Junk exposing (..)
 import LineChart.Legends as Legends
 import LineChart.Line as Line
-import Models exposing (CountryData)
+import Models exposing (CountryData, Model)
 
 
 linechart : List CountryData -> Bool -> Html.Html msg
@@ -54,6 +54,6 @@ colorTuple : List CountryData -> List ( CountryData, Color )
 colorTuple data =
     let
         colors =
-            [ Colors.blue, Colors.red, Colors.green, Colors.gold, Colors.purple, Colors.pink ]
+            [ Colors.blue, Colors.green, Colors.red, Colors.gold, Colors.purple, Colors.pink ]
     in
     List.map2 Tuple.pair data colors
