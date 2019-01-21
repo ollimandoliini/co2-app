@@ -1,8 +1,23 @@
-module Model exposing (CountryData, Datapoint, Flags, LoadingStatus(..), Model)
+module Model exposing (CountryData, Datapoint, Flags, LoadingStatus(..), Model, Msg(..))
 
 import Http exposing (Error)
 import Json.Decode as JD exposing (Decoder, field, float, int, string)
 import Menu
+
+
+type Msg
+    = CountryListReceived (Result Http.Error (List String))
+    | Change String
+    | KeyDown Int
+    | SearchAndAdd
+    | ResultReceived (Result Http.Error CountryData)
+    | RemoveCountry String
+    | TogglePerCapita
+
+
+
+-- | Hover (List String)
+-- | Hint
 
 
 type alias Flags =
@@ -23,6 +38,7 @@ type alias Model =
     , countries : List CountryData
     , percapita : Bool
     , countrylist : List String
+    , hovered : List String
     }
 
 

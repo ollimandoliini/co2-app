@@ -1,9 +1,8 @@
-module Main exposing (Msg(..), countryDataDecoder, getEmissionsbyCountry, init, main, showResult, subscriptions, update, view)
+module Main exposing (countryDataDecoder, getEmissionsbyCountry, init, main, showResult, subscriptions, update, view)
 
 import Array
 import Browser
 import Color exposing (Color)
-import Debug exposing (log)
 import Html exposing (Attribute, Html, button, div, form, h1, h2, input, label, li, p, span, table, tbody, text, th, thead, tr, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -11,7 +10,7 @@ import Http
 import Json.Decode as JD exposing (Decoder, field, float, int, string)
 import List.Extra exposing (uniqueBy)
 import Menu
-import Model exposing (..)
+import Model exposing (CountryData, Datapoint, Flags, LoadingStatus(..), Model, Msg(..))
 import Plot exposing (linechart)
 
 
@@ -41,6 +40,7 @@ init flags =
       , countries = []
       , percapita = False
       , countrylist = []
+      , hovered = []
       }
     , Cmd.batch [ getEmissionsbyCountry "Finland" flags, getEmissionsbyCountry "India" flags, getCountryList flags ]
     )
@@ -48,16 +48,6 @@ init flags =
 
 
 -- UPDATE
-
-
-type Msg
-    = CountryListReceived (Result Http.Error (List String))
-    | Change String
-    | KeyDown Int
-    | SearchAndAdd
-    | ResultReceived (Result Http.Error CountryData)
-    | RemoveCountry String
-    | TogglePerCapita
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -101,6 +91,19 @@ update msg model =
 
         TogglePerCapita ->
             ( { model | percapita = not model.percapita }, Cmd.none )
+
+
+
+-- Hover ->
+--     ( logsomething model, Cmd.none )
+
+
+logsomething model =
+    let
+        _ =
+            Debug.log "moro"
+    in
+    model
 
 
 addCountryData : List CountryData -> CountryData -> List CountryData
@@ -168,7 +171,7 @@ showResult model =
         Failure ->
             div [ class "result griditem" ]
                 [ text "Country not found"
-                , plot model.countries model.percapita
+                , plot model
                 ]
 
         Loading ->
@@ -177,18 +180,18 @@ showResult model =
         Success output ->
             div
                 [ class "result griditem" ]
-                [ plot model.countries model.percapita
+                [ plot model
                 ]
 
         Initial ->
             div [ class "result griditem" ] []
 
 
-plot : List CountryData -> Bool -> Html Msg
-plot data percapita =
+plot : Model -> Html Msg
+plot model =
     div
         [ class "plot-container", onClick TogglePerCapita ]
-        [ linechart data percapita
+        [ linechart model
         , div [] [ text "Click the plot to switch between absolute and per capita values" ]
         ]
 

@@ -16,16 +16,16 @@ import LineChart.Interpolation as Interpolation
 import LineChart.Junk as Junk exposing (..)
 import LineChart.Legends as Legends
 import LineChart.Line as Line
-import Models exposing (CountryData, Model)
+import Model exposing (..)
 
 
-linechart : List CountryData -> Bool -> Html.Html msg
-linechart data percapita =
+linechart : Model -> Html.Html msg
+linechart model =
     LineChart.viewCustom
         { y =
             Axis.default 400
                 "CO2"
-                (if percapita then
+                (if model.percapita then
                     .co2_per_capita
 
                  else
@@ -46,7 +46,7 @@ linechart data percapita =
         (List.map
             (\item -> LineChart.line (Tuple.second item) Dots.circle (Tuple.first item).country (Tuple.first item).dataPoints)
             (colorTuple
-                data
+                model.countries
             )
         )
 
