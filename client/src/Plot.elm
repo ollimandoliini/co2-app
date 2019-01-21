@@ -22,7 +22,7 @@ linechart : List CountryData -> Bool -> Html.Html msg
 linechart data percapita =
     LineChart.viewCustom
         { y =
-            Axis.default 450
+            Axis.default 400
                 "CO2"
                 (if percapita then
                     .co2_per_capita
@@ -30,8 +30,10 @@ linechart data percapita =
                  else
                     .co2_kilotons
                 )
-        , x = Axis.default 700 "Year" .year
-        , container = Container.styled "line-chart-1" [ ( "font-family", "Helvetica" ) ]
+        , x = Axis.default 650 "Year" .year
+
+        -- , container = Container.styled "line-chart-1" [ ( "font-family", "Helvetica" ) ]
+        , container = Container.responsive "line-chart-1"
         , interpolation = Interpolation.default
         , intersection = Intersection.default
         , legends = Legends.default

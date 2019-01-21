@@ -4,7 +4,7 @@ import Array
 import Browser
 import Color exposing (Color)
 import Debug exposing (log)
-import Html exposing (Attribute, Html, button, div, form, h1, img, input, label, li, span, table, tbody, text, th, thead, tr, ul)
+import Html exposing (Attribute, Html, button, div, form, h1, h2, input, label, li, p, span, table, tbody, text, th, thead, tr, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
@@ -29,6 +29,7 @@ main =
 
 
 
+-- ss
 -- MODEL
 
 
@@ -105,7 +106,7 @@ update msg model =
 addCountryData : List CountryData -> CountryData -> List CountryData
 addCountryData oldList countrydataitem =
     oldList
-        |> List.append [ countrydataitem ]
+        |> List.append [ filterEmptyDataPoints countrydataitem ]
         |> List.Extra.uniqueBy .country
 
 
@@ -135,11 +136,22 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div [ class "main-wrap" ]
-        [ h1 [ class "title" ] [ text "CO2-emissions" ]
-        , div [ class "search" ]
-            [ input [ class "searchField", placeholder "e.g.  Finland", onKeyDown KeyDown, onInput Change, value model.keyword ] []
-            , button [ class "searchButton", onClick SearchAndAdd ] [ text "Add" ]
-            , listCountries model.countries
+        [ div [ class "titleAndText griditem" ]
+            [ h1 [ class "title" ] [ text "Carbon dioxide emissions" ]
+            , div [ class "" ]
+                [ p [] [ text "Lorem ipsum 1" ]
+                , p [] [ text "Lorem ipsum 2" ]
+                ]
+            ]
+        , div [ class "searchAndCountryList griditem" ]
+            [ h2 [] [ text "Add countries" ]
+            , div [ class "search" ]
+                [ div [ class "searchbar" ]
+                    [ input [ class "searchField", placeholder "e.g.  Finland", onKeyDown KeyDown, onInput Change, value model.keyword ] []
+                    , button [ class "searchButton", onClick SearchAndAdd ] [ text "Add" ]
+                    ]
+                , listCountries model.countries
+                ]
             ]
         , showResult model
         ]
@@ -154,29 +166,31 @@ showResult : Model -> Html Msg
 showResult model =
     case model.loaded of
         Failure ->
-            div [ class "result" ]
+            div [ class "result griditem" ]
                 [ text "Country not found"
                 , plot model.countries model.percapita
                 ]
 
         Loading ->
-            div [ class "result" ] [ text "Loading..." ]
+            div [ class "result griditem" ] [ text "Loading..." ]
 
         Success output ->
             div
-                [ class "result" ]
+                [ class "result griditem" ]
                 [ plot model.countries model.percapita
                 ]
 
         Initial ->
-            div [ class "result" ] []
+            div [ class "result griditem" ] []
 
 
 plot : List CountryData -> Bool -> Html Msg
 plot data percapita =
     div
         [ class "plot-container", onClick TogglePerCapita ]
-        [ linechart data percapita ]
+        [ div [] [ text "Click the plot to switch between absolute and per capita values" ]
+        , linechart data percapita
+        ]
 
 
 listCountries : List CountryData -> Html Msg
