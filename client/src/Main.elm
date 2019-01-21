@@ -139,8 +139,8 @@ view model =
         [ div [ class "titleAndText griditem" ]
             [ h1 [ class "title" ] [ text "Carbon dioxide emissions" ]
             , div [ class "" ]
-                [ p [] [ text "Lorem ipsum 1" ]
-                , p [] [ text "Lorem ipsum 2" ]
+                [ p [] [ text "Explore carbon dioxide emissions by country in absolute and per capita values." ]
+                , p [] [ text "Add countries by entering them into the input below." ]
                 ]
             ]
         , div [ class "searchAndCountryList griditem" ]
@@ -188,8 +188,8 @@ plot : List CountryData -> Bool -> Html Msg
 plot data percapita =
     div
         [ class "plot-container", onClick TogglePerCapita ]
-        [ div [] [ text "Click the plot to switch between absolute and per capita values" ]
-        , linechart data percapita
+        [ linechart data percapita
+        , div [] [ text "Click the plot to switch between absolute and per capita values" ]
         ]
 
 

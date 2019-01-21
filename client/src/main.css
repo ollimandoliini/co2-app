@@ -17,8 +17,8 @@ body {
   /* width: 100%; */
   /* background-color: silver; */
   /* color: $text-color; */
-  font-family: Helvetica;
-  font-size: 14px;
+  /* font: 1.1em Helvetica, arial, sans-serif; */
+  font-family: Helvetica Neue, Arial, sans-serif;
   line-height: 1.5;
   background-color: rgb(236, 236, 236)
 }
@@ -30,36 +30,58 @@ body {
   margin: 0 auto;
   background-color: white;
   display: grid;
-  grid-gap: 20px;
+  grid-gap: 10px;
   grid-template-areas: 
   "titleandtext"
   "searchandcountrylist"
-  "result"
-
+  "plotcontainer"
 }
+h1 {
+  font-size: 24px;
+}
+
+h2 {
+  font-size: 16px;
+}
+p {
+  font-size: 12px;
+}
+
+
 @media (min-width: 500px) {
   .main-wrap {
     grid-template-columns: 1fr 2fr;
     /* grid-template-rows: 1fr 2fr; */
+    grid-gap: 20px;
     grid-template-areas: 
-    "titleandtext" "result"
-    "searchandcountrylist" "result"
+    "titleandtext" "plotcontainer"
+    "searchandcountrylist" "plotcontainer"
   }
+  h1 {
+    color: black;
+    font-size: 36px;
+    margin: 0;
+  }
+  h2 {
+    margin: 0;
+  }
+  .searchAndCountryList {
+    margin-top: 10px;
+  }
+  
 }
 @media (min-width: 700px) {
   .main-wrap {
-    grid-template-columns: 1fr 4fr;
+    grid-template-columns: 1fr 2fr;
+    grid-gap: 30px;
     grid-template-rows: 300px 1fr;
     grid-template-areas: 
-    "titleandtext" "result"
-    "searchandcountrylist" "result"
+    "titleandtext" "plotcontainer"
+    "searchandcountrylist" "plotcontainer"
   }
 }
 
-h1 {
-  color: black;
-  font-size: 36px;
-}
+
 
 /* .griditem {
   width: 100%;
@@ -70,7 +92,7 @@ h1 {
 }
 
 .searchAndCountryList {
-  margin-top: 30px;
+  /* margin-top: 30px; */
   grid-area: searchandcountrylist;
 }
 
@@ -111,7 +133,6 @@ h1 {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  align-content: space-between;
 }
 
 .country-item {
@@ -125,6 +146,8 @@ h1 {
 
 .result {
   width: 100%;
+  text-align: center;
+  font-size: 14px;
 }
 
 .plot-container {

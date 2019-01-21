@@ -1,7 +1,8 @@
 module Plot exposing (colorTuple, linechart)
 
 import Color exposing (Color)
-import Html exposing (Html)
+import Html
+import Html.Attributes
 import LineChart
 import LineChart.Area as Area
 import LineChart.Axis as Axis
@@ -31,25 +32,34 @@ linechart data percapita =
                     .co2_kilotons
                 )
         , x = Axis.default 650 "Year" .year
-
-        -- , container = Container.styled "line-chart-1" [ ( "font-family", "Helvetica" ) ]
-        , container = Container.responsive "line-chart-1"
+        , container = containerConfig
         , interpolation = Interpolation.default
         , intersection = Intersection.default
         , legends = Legends.default
         , events = Events.default
         , junk = Junk.default
-        , grid = Grid.default
+        , grid = Grid.lines 1 Color.gray
         , area = Area.default
         , line = Line.default
-        , dots = Dots.default
+        , dots = Dots.custom (Dots.full 2)
         }
         (List.map
-            (\item -> LineChart.line (Tuple.second item) Dots.diamond (Tuple.first item).country (Tuple.first item).dataPoints)
+            (\item -> LineChart.line (Tuple.second item) Dots.circle (Tuple.first item).country (Tuple.first item).dataPoints)
             (colorTuple
                 data
             )
         )
+
+
+containerConfig : Container.Config msg
+containerConfig =
+    Container.custom
+        { attributesHtml = []
+        , attributesSvg = []
+        , size = Container.relative
+        , margin = Container.Margin 20 110 20 75
+        , id = "line-chart-area"
+        }
 
 
 colorTuple : List CountryData -> List ( CountryData, Color )
