@@ -9,82 +9,135 @@
   height: inherit;
 }
 
+* {box-sizing: border-box}
+
+
 body {
-  position: relative;
-  width: 100%;
+  /* position: relative; */
+  /* width: 100%; */
   /* background-color: silver; */
   /* color: $text-color; */
-  font-family: Helvetica;
-  font-size: 14px;
+  /* font: 1.1em Helvetica, arial, sans-serif; */
+  font-family: Helvetica Neue, Arial, sans-serif;
   line-height: 1.5;
+  background-color: rgb(236, 236, 236)
 }
 
 .main-wrap {
-  width: 1280px;
+  max-width: 1280px;
   padding: 30px;
+  height: 100vh;
   margin: 0 auto;
-  /* background-color: rgb(209, 209, 209); */
-  /* border: solid 1px */
+  background-color: white;
+  display: grid;
+  grid-gap: 10px;
+  grid-template-areas: 
+  "titleandtext"
+  "searchandcountrylist"
+  "plotcontainer"
 }
-
 h1 {
-  color: black;
-  font-size: 40px;
+  font-size: 24px;
 }
 
-.search {
-  width: 200px;
-  position: relative;
-  /* display: inline-block; */
+h2 {
+  font-size: 16px;
+}
+p {
+  font-size: 12px;
+}
+
+
+@media (min-width: 500px) {
+  .main-wrap {
+    grid-template-columns: 1fr 2fr;
+    /* grid-template-rows: 1fr 2fr; */
+    grid-gap: 20px;
+    grid-template-areas: 
+    "titleandtext" "plotcontainer"
+    "searchandcountrylist" "plotcontainer"
+  }
+  h1 {
+    color: black;
+    font-size: 36px;
+    margin: 0;
+  }
+  h2 {
+    margin: 0;
+  }
+  .searchAndCountryList {
+    margin-top: 10px;
+  }
   
+}
+@media (min-width: 700px) {
+  .main-wrap {
+    grid-template-columns: 1fr 2fr;
+    grid-gap: 30px;
+    grid-template-rows: 300px 1fr;
+    grid-template-areas: 
+    "titleandtext" "plotcontainer"
+    "searchandcountrylist" "plotcontainer"
+  }
+}
+
+
+
+/* .griditem {
+  width: 100%;
+} */
+
+.titleAndText {
+  grid-area: titleandtext;
+}
+
+.searchAndCountryList {
+  /* margin-top: 30px; */
+  grid-area: searchandcountrylist;
+}
+
+.searchbar {
+  display: flex;
+
 }
 
 .searchField {
-  float: left;
-  width: 100%;
   border: 2px solid rgb(0, 0, 0);
   padding: 5px;
-  height: 20px;
+  height: 30px;
   border-radius: 4px;
   outline: none;
   color: #9DBFAF;
+  font-size: 16px;
 }
 
 .searchButton {
-  position: absolute;  
-  right: -50px;
-  width: 50px;
-  height: 34px;
-  border: 1px solid black;
   background: black;
   text-align: center;
   color: #fff;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 20px; 
 }
+
+
 ::-webkit-input-placeholder {
-  color: rgb(80, 80, 80);
+  color: rgb(182, 182, 182);
   font-size: 16px;
 }
 
 
-.container{
-  /* margin: 0 auto; */
-  max-width: 50em;
-  padding: 4em 2em;
-}
+
 
 .country-list{
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  align-content: space-between;
 }
 
 .country-item {
   list-style-type: none;
-  font-size: 12px;
+  font-size: 14px;
   border: 2px solid;
   border-radius: 4px;
   padding: 2px;
@@ -92,12 +145,14 @@ h1 {
 }
 
 .result {
+  width: 100%;
   text-align: center;
-  display: inline-block;
+  font-size: 14px;
 }
 
 .plot-container {
   cursor: pointer;
+  grid-area: plotcontainer;
 }
 
 .country-item {

@@ -1,19 +1,17 @@
-module Main exposing (Msg(..), countryDataDecoder, getEmissionsbyCountry, init, main, showResult, subscriptions, update, view)
+module Main exposing (countryDataDecoder, getEmissionsbyCountry, init, main, showResult, subscriptions, update, view)
 
 import Array
 import Browser
 import Color exposing (Color)
-import Debug exposing (log)
-import Html exposing (Attribute, Html, button, div, form, h1, img, input, label, li, span, table, tbody, text, th, thead, tr, ul)
+import Html exposing (Attribute, Html, button, div, form, h1, h2, input, label, li, p, span, table, tbody, text, th, thead, tr, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
 import Json.Decode as JD exposing (Decoder, field, float, int, string)
 import List.Extra exposing (uniqueBy)
 import Menu
-import Model exposing (..)
+import Model exposing (CountryData, Datapoint, Flags, LoadingStatus(..), Model, Msg(..))
 import Plot exposing (linechart)
-import Set
 
 
 
@@ -30,6 +28,7 @@ main =
 
 
 
+-- ss
 -- MODEL
 
 
@@ -41,6 +40,7 @@ init flags =
       , countries = []
       , percapita = False
       , countrylist = []
+      , hovered = []
       }
     , Cmd.batch [ getEmissionsbyCountry "Finland" flags, getEmissionsbyCountry "India" flags, getCountryList flags ]
     )
@@ -48,16 +48,6 @@ init flags =
 
 
 -- UPDATE
-
-
-type Msg
-    = CountryListReceived (Result Http.Error (List String))
-    | Change String
-    | KeyDown Int
-    | SearchAndAdd
-    | ResultReceived (Result Http.Error CountryData)
-    | RemoveCountry String
-    | TogglePerCapita
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -103,11 +93,24 @@ update msg model =
             ( { model | percapita = not model.percapita }, Cmd.none )
 
 
+
+-- Hover ->
+--     ( logsomething model, Cmd.none )
+
+
+logsomething model =
+    let
+        _ =
+            Debug.log "moro"
+    in
+    model
+
+
 addCountryData : List CountryData -> CountryData -> List CountryData
 addCountryData oldList countrydataitem =
     oldList
-        |> List.append [ countrydataitem ]
-        |> List.Extra.uniqueBy (\obj -> obj.country)
+        |> List.append [ filterEmptyDataPoints countrydataitem ]
+        |> List.Extra.uniqueBy .country
 
 
 filterEmptyDataPoints : CountryData -> CountryData
@@ -136,11 +139,22 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div [ class "main-wrap" ]
-        [ h1 [ class "title" ] [ text "CO2-emissions" ]
-        , div [ class "search" ]
-            [ input [ class "searchField", placeholder "e.g.  Finland", onKeyDown KeyDown, onInput Change, value model.keyword ] []
-            , button [ class "searchButton", onClick SearchAndAdd ] [ text "Add" ]
-            , listCountries model.countries
+        [ div [ class "titleAndText griditem" ]
+            [ h1 [ class "title" ] [ text "Carbon dioxide emissions" ]
+            , div [ class "" ]
+                [ p [] [ text "Explore carbon dioxide emissions by country in absolute and per capita values." ]
+                , p [] [ text "Add countries by entering them into the input below." ]
+                ]
+            ]
+        , div [ class "searchAndCountryList griditem" ]
+            [ h2 [] [ text "Add countries" ]
+            , div [ class "search" ]
+                [ div [ class "searchbar" ]
+                    [ input [ class "searchField", placeholder "e.g.  Finland", onKeyDown KeyDown, onInput Change, value model.keyword ] []
+                    , button [ class "searchButton", onClick SearchAndAdd ] [ text "Add" ]
+                    ]
+                , listCountries model.countries
+                ]
             ]
         , showResult model
         ]
@@ -155,29 +169,31 @@ showResult : Model -> Html Msg
 showResult model =
     case model.loaded of
         Failure ->
-            div [ class "result" ]
+            div [ class "result griditem" ]
                 [ text "Country not found"
-                , plot model.countries model.percapita
+                , plot model
                 ]
 
         Loading ->
-            div [ class "result" ] [ text "Loading..." ]
+            div [ class "result griditem" ] [ text "Loading..." ]
 
         Success output ->
             div
-                [ class "result" ]
-                [ plot model.countries model.percapita
+                [ class "result griditem" ]
+                [ plot model
                 ]
 
         Initial ->
-            div [ class "result" ] []
+            div [ class "result griditem" ] []
 
 
-plot : List CountryData -> Bool -> Html Msg
-plot data percapita =
+plot : Model -> Html Msg
+plot model =
     div
         [ class "plot-container", onClick TogglePerCapita ]
-        [ linechart data percapita ]
+        [ linechart model
+        , div [] [ text "Click the plot to switch between absolute and per capita values" ]
+        ]
 
 
 listCountries : List CountryData -> Html Msg
