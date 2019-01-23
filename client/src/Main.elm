@@ -325,7 +325,7 @@ plot model =
     div
         [ class "plot-container", onClick TogglePerCapita ]
         [ linechart model
-        , div [] [ text "Click the plot to switch between absolute and per capita values" ]
+        , div [ class "clickinfo" ] [ text "Click the plot to switch between absolute and per capita values" ]
         ]
 
 
@@ -336,7 +336,11 @@ listCountries countrieslist =
 
 countryItem : CountryData -> Html Msg
 countryItem countrydata =
-    span [ onClick (RemoveCountry countrydata.country), class "country-item" ] [ li [] [ text (countrydata.country ++ " x") ] ]
+    let
+        deletechar =
+            String.fromChar (Char.fromCode 10005)
+    in
+    span [ onClick (RemoveCountry countrydata.country), class "country-item" ] [ li [] [ text (countrydata.country ++ " " ++ deletechar) ] ]
 
 
 removeCountry : List CountryData -> String -> List CountryData

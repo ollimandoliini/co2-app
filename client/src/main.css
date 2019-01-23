@@ -13,13 +13,9 @@
 
 
 body {
-  /* position: relative; */
-  /* width: 100%; */
-  /* background-color: silver; */
-  /* color: $text-color; */
-  /* font: 1.1em Helvetica, arial, sans-serif; */
   font-family: monospace;
-  line-height: 1.5;
+  margin: 0;
+  /* line-height: 1.5; */
   background-image: linear-gradient(to right, rgb(51,	195,105), rgb(45, 162, 153));
 }
 
@@ -27,12 +23,12 @@ body {
   max-width: 1280px;
   border-radius: 15px;
   padding: 30px;
-  height: 100vh;
-  margin: 20px auto;
+  height: 93vh;
+  margin: 25px auto 0 auto;
   background-color: rgb(243, 243, 243);
   display: grid;
   grid-gap: 10px;
-  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   grid-template-areas:
   "titleandtext"
   "searchandcountrylist"
@@ -40,67 +36,63 @@ body {
 }
 
 .title {
-  margin: 10px 20px;
+  margin: 10px 0px;
   font-size: 42px;
   font-family: Helvetica;
-  color: rgb(45, 162, 153)
+  color: rgb(45, 162, 153);
 }
 
 h2 {
   font-size: 16px;
   font-family: Helvetica;
+  color: rgb(45, 162, 153);
+
 }
 .info {
   font-size: 14px;
 }
 
 
-@media (min-width: 500px) {
+@media (max-width: 500px) {
   .main-wrap {
-    grid-template-columns: 1fr 2fr;
-    /* grid-template-rows: 1fr 2fr; */
-    grid-gap: 20px;
-    grid-template-areas: 
-    "titleandtext" "plotcontainer"
-    "searchandcountrylist" "plotcontainer"
-  }
-  h1 {
-    color: black;
-    font-size: 36px;
-    margin: 0;
-  }
-  h2 {
-    margin: 0;
+    padding: 10px;
+    margin: 5px 2px;
+    height: 99vh;
   }
   .searchAndCountryList {
-    margin-top: 10px;
+    padding: 20px  ;
   }
-  
 }
+
+
 @media (min-width: 700px) {
   .main-wrap {
-    grid-template-columns: 1fr 2fr;
-    grid-gap: 30px;
-    grid-template-rows: 300px 1fr;
-    grid-template-areas: 
-    "titleandtext" "plotcontainer"
-    "searchandcountrylist" "plotcontainer"
+    grid-gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
   }
+  .titleAndText {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+  }
+  .result {
+    grid-column: 2 / span 3;
+    grid-row: 2 / span 3;
+  }
+  .searchAndCountryList {
+    grid-column: 2 / span 3;
+    grid-row: 1;
+    margin: 20px 100px
+  }
+
+  
 }
-
-
-
-/* .griditem {
-  width: 100%;
-} */
-
-.titleAndText {
-  grid-area: titleandtext;
-}
-
-.searchAndCountryList {
-  /* margin-top: 30px; */
-  grid-area: searchandcountrylist;
+.result, .searchAndCountryList, .title {
+    -webkit-user-select: none; /* Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
 }
 
 .searchbar {
@@ -134,7 +126,9 @@ h2 {
   font-size: 16px;
 }
 
-
+.clickinfo {
+  margin-top: 20px;
+}
 
 
 .country-list{
@@ -149,12 +143,12 @@ h2 {
   font-size: 16px;
   border: 2px solid;
   border-radius: 4px;
-  padding: 3px;
+  padding: 3px 6px;
   margin: 2px;
    transition: all .2s ease-in-out; 
 }
 .country-item:hover{
-  transform: scale(1.03);
+  transform: scale(1.01);
 }
 
 .result {
