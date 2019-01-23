@@ -13,8 +13,11 @@ type Msg
     | ResultReceived (Result Http.Error CountryData)
     | RemoveCountry String
     | TogglePerCapita
-    | SelectCountry String
+    | SelectCountryKeyboard String
+    | SelectCountryMouse String
     | SetAutoState Menu.Msg
+    | Reset
+    | NoOp
 
 
 type alias Flags =

@@ -107,8 +107,9 @@ p {
   height: 30px;
   border-radius: 4px;
   outline: none;
-  color: #9DBFAF;
+  color: rgb(0, 0, 0);
   font-size: 16px;
+  width: 200px;
 }
 
 .searchButton {
@@ -137,11 +138,15 @@ p {
 
 .country-item {
   list-style-type: none;
-  font-size: 14px;
+  font-size: 16px;
   border: 2px solid;
   border-radius: 4px;
-  padding: 2px;
+  padding: 3px;
   margin: 2px;
+   transition: all .2s ease-in-out; 
+}
+.country-item:hover{
+  transform: scale(1.03);
 }
 
 .result {
@@ -167,6 +172,10 @@ p {
   margin: 0 0 0 0;
   border: solid 1px black;
   border-radius: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 200px;
 
 }
 .autocomplete-item {

@@ -2,6 +2,7 @@ module Main exposing (countryDataDecoder, getEmissionsbyCountry, init, main, sho
 
 import Array
 import Browser
+import Browser.Dom as Dom
 import Color exposing (Color)
 import Debug
 import Html exposing (Attribute, Html, button, div, form, h1, h2, input, label, li, p, span, table, tbody, text, th, thead, tr, ul)
@@ -13,6 +14,7 @@ import List.Extra exposing (uniqueBy)
 import Menu
 import Model exposing (CountryData, Datapoint, Flags, LoadingStatus(..), Model, Msg(..))
 import Plot exposing (linechart)
+import Task
 
 
 
@@ -56,7 +58,7 @@ init flags =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
+    case Debug.log "message" msg of
         CountryListReceived result ->
             case result of
                 Ok output ->
@@ -100,12 +102,20 @@ update msg model =
         TogglePerCapita ->
             ( { model | percapita = not model.percapita }, Cmd.none )
 
-        SelectCountry id ->
+        SelectCountryKeyboard id ->
             let
                 newModel =
                     setQuery model id
             in
             ( newModel, Cmd.none )
+
+        SelectCountryMouse id ->
+            let
+                newModel =
+                    setQuery model id
+                        |> resetMenu
+            in
+            ( newModel, getEmissionsbyCountry id model.envs )
 
         SetAutoState autoMsg ->
             let
@@ -122,6 +132,29 @@ update msg model =
             maybeMsg
                 |> Maybe.map (\updateMsg -> update updateMsg newModel)
                 |> Maybe.withDefault ( newModel, Cmd.none )
+
+        Reset ->
+            ( { model
+                | autoState = Menu.reset updateConfig model.autoState
+                , selectedCountry = Nothing
+              }
+            , Cmd.none
+            )
+
+        NoOp ->
+            ( model, Cmd.none )
+
+
+removeSelection model =
+    { model | selectedCountry = Nothing }
+
+
+resetMenu model =
+    { model
+        | autoState = Menu.empty
+        , keyword = ""
+        , showMenu = False
+    }
 
 
 getCountryAtId countrylist id =
@@ -154,15 +187,15 @@ updateConfig =
         , onKeyDown =
             \code maybeId ->
                 if code == 13 then
-                    Maybe.map SelectCountry maybeId
+                    Maybe.map SelectCountryKeyboard maybeId
 
                 else
-                    Nothing
+                    Just Reset
         , onTooLow = Nothing
         , onTooHigh = Nothing
         , onMouseEnter = \_ -> Nothing
         , onMouseLeave = \_ -> Nothing
-        , onMouseClick = \id -> Just <| SelectCountry id
+        , onMouseClick = \id -> Just (SelectCountryMouse id)
         , separateSelections = False
         }
 
