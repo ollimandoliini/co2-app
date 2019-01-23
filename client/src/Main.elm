@@ -4,7 +4,6 @@ import Array
 import Browser
 import Browser.Dom as Dom
 import Color exposing (Color)
-import Debug
 import Html exposing (Attribute, Html, button, div, form, h1, h2, input, label, li, p, span, table, tbody, text, th, thead, tr, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -58,7 +57,7 @@ init flags =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case Debug.log "message" msg of
+    case msg of
         CountryListReceived result ->
             case result of
                 Ok output ->
