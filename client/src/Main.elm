@@ -3,6 +3,7 @@ module Main exposing (countryDataDecoder, getEmissionsbyCountry, init, main, sho
 import Array
 import Browser
 import Color exposing (Color)
+import Debug
 import Html exposing (Attribute, Html, button, div, form, h1, h2, input, label, li, p, span, table, tbody, text, th, thead, tr, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -28,7 +29,6 @@ main =
 
 
 
--- ss
 -- MODEL
 
 
@@ -41,6 +41,10 @@ init flags =
       , percapita = False
       , countrylist = []
       , hovered = []
+      , autoState = Menu.empty
+      , menuHowManyToShow = 5
+      , selectedCountry = Nothing
+      , showMenu = False
       }
     , Cmd.batch [ getEmissionsbyCountry "Finland" flags, getEmissionsbyCountry "India" flags, getCountryList flags ]
     )
@@ -62,7 +66,11 @@ update msg model =
                     ( model, Cmd.none )
 
         Change newContent ->
-            ( { model | keyword = newContent }, Cmd.none )
+            let
+                showMenu =
+                    not (List.isEmpty (acceptableCountries model.keyword model.countrylist)) && String.length newContent > 0
+            in
+            ( { model | keyword = newContent, showMenu = showMenu }, Cmd.none )
 
         SearchAndAdd ->
             if String.length model.keyword > 0 then
@@ -92,18 +100,86 @@ update msg model =
         TogglePerCapita ->
             ( { model | percapita = not model.percapita }, Cmd.none )
 
+        SelectCountry id ->
+            let
+                newModel =
+                    setQuery model id
+            in
+            ( newModel, Cmd.none )
+
+        SetAutoState autoMsg ->
+            let
+                ( newState, maybeMsg ) =
+                    Menu.update updateConfig
+                        autoMsg
+                        model.menuHowManyToShow
+                        model.autoState
+                        (acceptableCountries model.keyword model.countrylist)
+
+                newModel =
+                    { model | autoState = newState }
+            in
+            maybeMsg
+                |> Maybe.map (\updateMsg -> update updateMsg newModel)
+                |> Maybe.withDefault ( newModel, Cmd.none )
 
 
--- Hover ->
---     ( logsomething model, Cmd.none )
+getCountryAtId countrylist id =
+    List.filter (\country -> country == id) countrylist
+        |> List.head
+        |> Maybe.withDefault ""
 
 
-logsomething model =
+setQuery : Model -> String -> Model
+setQuery model id =
+    { model
+        | keyword = getCountryAtId model.countrylist id
+        , selectedCountry = Just (getCountryAtId model.countrylist id)
+    }
+
+
+acceptableCountries : String -> List String -> List String
+acceptableCountries keyword countrylist =
     let
-        _ =
-            Debug.log "moro"
+        lowerQuery =
+            String.toLower keyword
     in
-    model
+    List.filter (String.contains lowerQuery << String.toLower) countrylist
+
+
+updateConfig : Menu.UpdateConfig Msg String
+updateConfig =
+    Menu.updateConfig
+        { toId = identity
+        , onKeyDown =
+            \code maybeId ->
+                if code == 13 then
+                    Maybe.map SelectCountry maybeId
+
+                else
+                    Nothing
+        , onTooLow = Nothing
+        , onTooHigh = Nothing
+        , onMouseEnter = \_ -> Nothing
+        , onMouseLeave = \_ -> Nothing
+        , onMouseClick = \id -> Just <| SelectCountry id
+        , separateSelections = False
+        }
+
+
+viewConfig : Menu.ViewConfig String
+viewConfig =
+    let
+        customizedLi keySelected mouseSelected countryname =
+            { attributes = [ classList [ ( "autocomplete-item", True ), ( "is-selected", keySelected || mouseSelected ) ] ]
+            , children = [ Html.text countryname ]
+            }
+    in
+    Menu.viewConfig
+        { toId = identity
+        , ul = [ class "autocomplete-list" ]
+        , li = customizedLi
+        }
 
 
 addCountryData : List CountryData -> CountryData -> List CountryData
@@ -129,7 +205,7 @@ removeZeros oldList =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Sub.map SetAutoState Menu.subscription
 
 
 
@@ -150,14 +226,35 @@ view model =
             [ h2 [] [ text "Add countries" ]
             , div [ class "search" ]
                 [ div [ class "searchbar" ]
-                    [ input [ class "searchField", placeholder "e.g.  Finland", onKeyDown KeyDown, onInput Change, value model.keyword ] []
-                    , button [ class "searchButton", onClick SearchAndAdd ] [ text "Add" ]
+                    [ searchView model
                     ]
                 , listCountries model.countries
                 ]
             ]
         , showResult model
         ]
+
+
+searchView : Model -> Html Msg
+searchView model =
+    let
+        menu =
+            if model.showMenu then
+                viewMenu model
+
+            else
+                Html.text ""
+    in
+    div []
+        [ input [ class "searchField", placeholder "e.g.  Finland", onKeyDown KeyDown, onInput Change, value model.keyword ] []
+        , button [ class "searchButton", onClick SearchAndAdd ] [ text "Add" ]
+        , menu
+        ]
+
+
+viewMenu : Model -> Html Msg
+viewMenu model =
+    Html.map SetAutoState (Menu.view viewConfig model.menuHowManyToShow model.autoState (acceptableCountries model.keyword model.countrylist))
 
 
 onKeyDown : (Int -> msg) -> Attribute msg

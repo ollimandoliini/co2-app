@@ -13,11 +13,8 @@ type Msg
     | ResultReceived (Result Http.Error CountryData)
     | RemoveCountry String
     | TogglePerCapita
-
-
-
--- | Hover (List String)
--- | Hint
+    | SelectCountry String
+    | SetAutoState Menu.Msg
 
 
 type alias Flags =
@@ -39,6 +36,10 @@ type alias Model =
     , percapita : Bool
     , countrylist : List String
     , hovered : List String
+    , autoState : Menu.State
+    , menuHowManyToShow : Int
+    , selectedCountry : Maybe String
+    , showMenu : Bool
     }
 
 
