@@ -246,12 +246,16 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
+    let
+        mainTitle =
+            "CO" ++ String.fromChar (Char.fromCode 8322) ++ " EMISSIONS"
+    in
     div [ class "main-wrap" ]
         [ div [ class "titleAndText griditem" ]
-            [ h1 [ class "title" ] [ text "Carbon dioxide emissions" ]
+            [ h1 [ class "title" ] [ text mainTitle ]
             , div [ class "" ]
-                [ p [] [ text "Explore carbon dioxide emissions by country in absolute and per capita values." ]
-                , p [] [ text "Add countries by entering them into the input below." ]
+                [ p [ class "info" ] [ text "Explore carbon dioxide emissions by country in absolute and per capita values." ]
+                , p [ class "info" ] [ text "Add countries by entering them into the input below." ]
                 ]
             ]
         , div [ class "searchAndCountryList griditem" ]

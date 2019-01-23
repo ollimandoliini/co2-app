@@ -18,33 +18,40 @@ body {
   /* background-color: silver; */
   /* color: $text-color; */
   /* font: 1.1em Helvetica, arial, sans-serif; */
-  font-family: Helvetica Neue, Arial, sans-serif;
+  font-family: monospace;
   line-height: 1.5;
-  background-color: rgb(236, 236, 236)
+  background-image: linear-gradient(to right, rgb(51,	195,105), rgb(45, 162, 153));
 }
 
 .main-wrap {
   max-width: 1280px;
+  border-radius: 15px;
   padding: 30px;
   height: 100vh;
-  margin: 0 auto;
-  background-color: white;
+  margin: 20px auto;
+  background-color: rgb(243, 243, 243);
   display: grid;
   grid-gap: 10px;
-  grid-template-areas: 
+  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+  grid-template-areas:
   "titleandtext"
   "searchandcountrylist"
   "plotcontainer"
 }
-h1 {
-  font-size: 24px;
+
+.title {
+  margin: 10px 20px;
+  font-size: 42px;
+  font-family: Helvetica;
+  color: rgb(45, 162, 153)
 }
 
 h2 {
   font-size: 16px;
+  font-family: Helvetica;
 }
-p {
-  font-size: 12px;
+.info {
+  font-size: 14px;
 }
 
 
@@ -134,6 +141,7 @@ p {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  padding-left: 0;
 }
 
 .country-item {
