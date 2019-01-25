@@ -23,12 +23,12 @@ linechart : Model -> Html.Html msg
 linechart model =
     LineChart.viewCustom
         { y =
-            Axis.full 400
+            Axis.full 450
                 (if model.percapita then
-                    "Per Capita"
+                    "CO2 Per Capita"
 
                  else
-                    "Absolute"
+                    "CO2 Absolute"
                 )
                 (if model.percapita then
                     .co2_per_capita
@@ -36,11 +36,11 @@ linechart model =
                  else
                     .co2_kilotons
                 )
-        , x = Axis.default 650 "Year" .year
+        , x = Axis.default 800 "Year" .year
         , container = containerConfig
         , interpolation = Interpolation.default
         , intersection = Intersection.default
-        , legends = Legends.grouped .max .min -460 -330
+        , legends = Legends.grouped .max .min -580 -370
 
         -- , legends = Legends.default
         , events = Events.default
@@ -64,7 +64,7 @@ containerConfig =
         { attributesHtml = []
         , attributesSvg = []
         , size = Container.relative
-        , margin = Container.Margin 20 110 20 75
+        , margin = Container.Margin 20 110 20 110
         , id = "line-chart-area"
         }
 

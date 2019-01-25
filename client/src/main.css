@@ -172,7 +172,7 @@ h2 {
   grid-area: plotcontainer;
 }
 
-.is-selected {
+.is-selected, .key-selected {
   background-color: rgba(0, 0, 0, 0.1);
 }
 
@@ -183,6 +183,7 @@ h2 {
   background-color: red;
   margin: 5px;
 }
+
 
 
 .autocomplete-list {

@@ -78,8 +78,8 @@ addInitialData model initialdata =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    -- case Debug.log "message" msg of
-    case msg of
+    case Debug.log "message" msg of
+        -- case msg of
         InitialDataReceived result ->
             case result of
                 Ok output ->
@@ -87,13 +87,6 @@ update msg model =
 
                 Err _ ->
                     ( { model | loaded = Failure }, Cmd.none )
-
-        Change newContent ->
-            let
-                showMenu =
-                    not (List.isEmpty (acceptableCountries model.keyword model.countrylist)) && String.length newContent > 0
-            in
-            ( { model | keyword = newContent, showMenu = showMenu }, Cmd.none )
 
         SearchAndAdd ->
             if String.length model.keyword > 0 then
@@ -241,10 +234,6 @@ getCountryAtId countrylist id =
 
 setQuery : Model -> String -> Model
 setQuery model id =
-    -- { model
-    --     | keyword = getCountryAtId model.countrylist id
-    --     , selectedCountry = Just (getCountryAtId model.countrylist id)
-    -- }
     { model
         | keyword = getCountryAtId model.countrylist id
     }
@@ -278,6 +267,8 @@ updateConfig =
 
         -- , onMouseEnter = \id -> Just (PreviewCountry id)
         , onMouseEnter = \_ -> Nothing
+
+        -- , onMouseEnter = \_ -> Nothing
         , onMouseLeave = \_ -> Nothing
         , onMouseClick = \id -> Just (SelectCountryMouse id)
         , separateSelections = False
@@ -288,13 +279,19 @@ viewConfig : Menu.ViewConfig String
 viewConfig =
     let
         customizedLi keySelected mouseSelected countryname =
-            { attributes = [ classList [ ( "autocomplete-item", True ), ( "is-selected", keySelected || mouseSelected ) ] ]
+            { attributes =
+                [ Attrs.classList
+                    [ ( "autocomplete-item", True )
+                    , ( "key-selected", keySelected || mouseSelected )
+                    ]
+                , Attrs.id countryname
+                ]
             , children = [ Html.text countryname ]
             }
     in
     Menu.viewConfig
         { toId = identity
-        , ul = [ class "autocomplete-list" ]
+        , ul = [ Attrs.class "autocomplete-list" ]
         , li = customizedLi
         }
 
@@ -408,6 +405,7 @@ searchView model =
                     , Html.Events.preventDefaultOn "keydown" upDownEscDecoder
                     , Attrs.value query
                     , Attrs.class "searchField"
+                    , Attrs.class "autocomplete-input"
                     , Attrs.autocomplete False
                     , Attrs.attribute "aria-owns" "list-of-countries"
                     , Attrs.attribute "aria-expanded" (boolToString model.showMenu)
@@ -472,7 +470,7 @@ showResult model =
 plot : Model -> Html Msg
 plot model =
     div
-        [ class "plot-container", onClick TogglePerCapita ]
+        [ class "plot-container", id "plot-container", onClick TogglePerCapita ]
         [ linechart model
         , div [ class "clickinfo" ] [ text "Click the plot to switch between absolute and per capita values" ]
         ]
