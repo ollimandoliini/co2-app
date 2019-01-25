@@ -7,6 +7,7 @@ import Menu
 
 type Msg
     = CountryListReceived (Result Http.Error (List String))
+    | InitialDataReceived (Result Http.Error InitialData)
     | Change String
     | KeyDown Int
     | SearchAndAdd
@@ -18,6 +19,13 @@ type Msg
     | SetAutoState Menu.Msg
     | Reset
     | NoOp
+
+
+type alias InitialData =
+    ( countrylist : List String
+    , firstcountry : CountryData
+    , secondcountry : CountryData
+    )
 
 
 type alias Flags =

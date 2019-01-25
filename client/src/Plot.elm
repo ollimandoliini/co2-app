@@ -66,6 +66,6 @@ colorTuple : List CountryData -> List ( CountryData, Color )
 colorTuple data =
     let
         colors =
-            [ Colors.blue, Colors.green, Colors.red, Colors.gold, Colors.purple, Colors.pink ]
+            [ Color.blue, Colors.green, Colors.red, Colors.gold, Colors.purple, Colors.pink ]
     in
     List.map2 Tuple.pair data colors

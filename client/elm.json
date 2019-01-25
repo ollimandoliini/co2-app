@@ -15,6 +15,7 @@
             "elm/json": "1.1.2",
             "elm/url": "1.0.0",
             "elm-community/list-extra": "8.1.0",
+            "prikhi/http-tasks": "1.0.0",
             "terezka/line-charts": "2.0.0"
         },
         "indirect": {

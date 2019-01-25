@@ -18,7 +18,7 @@ def after_request(response):
 
 api.add_resource(Country, '/countries/<country>/')
 api.add_resource(CountryPlot, '/countries/<country>.png')
-api.add_resource(CountryNames, '/countries/list/')
+api.add_resource(CountryNames, '/countries/')
 
 
 if __name__ == '__main__':

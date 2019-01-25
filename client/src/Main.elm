@@ -8,12 +8,13 @@ import Html exposing (Attribute, Html, button, div, form, h1, h2, input, label, 
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
+import Http.Tasks exposing (..)
 import Json.Decode as JD exposing (Decoder, field, float, int, string)
 import List.Extra exposing (uniqueBy)
 import Menu
 import Model exposing (CountryData, Datapoint, Flags, LoadingStatus(..), Model, Msg(..))
 import Plot exposing (linechart)
-import Task
+import Task exposing (Task)
 
 
 
@@ -47,7 +48,7 @@ init flags =
       , selectedCountry = Nothing
       , showMenu = False
       }
-    , Cmd.batch [ getEmissionsbyCountry "Finland" flags, getEmissionsbyCountry "India" flags, getCountryList flags ]
+    , Cmd.none
     )
 
 
@@ -57,11 +58,19 @@ init flags =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
+    case Debug.log "message" msg of
         CountryListReceived result ->
             case result of
                 Ok output ->
                     ( { model | countrylist = output }, Cmd.none )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
+        InitialDataReceived result ->
+            case result of
+                Ok output ->
+                    ( model, Cmd.none )
 
                 Err _ ->
                     ( model, Cmd.none )
@@ -216,9 +225,13 @@ viewConfig =
 
 addCountryData : List CountryData -> CountryData -> List CountryData
 addCountryData oldList countrydataitem =
-    oldList
-        |> List.append [ filterEmptyDataPoints countrydataitem ]
-        |> List.Extra.uniqueBy .country
+    List.Extra.uniqueBy .country (oldList ++ [ filterEmptyDataPoints countrydataitem ])
+
+
+
+-- oldList
+--     |> List.append [ filterEmptyDataPoints countrydataitem ]
+--     |> List.Extra.uniqueBy .country
 
 
 filterEmptyDataPoints : CountryData -> CountryData
@@ -348,24 +361,52 @@ removeCountry oldlist countryname =
     List.filter (\countryData -> countryData.country /= countryname) oldlist
 
 
+getCountryListTask : Flags -> Task Http.Error (List String)
+getCountryListTask flags =
+    get
+        { url = flags.apiUrl ++ "countries/"
+        , resolver = resolveJson (JD.list string)
+        }
 
--- HTTP
+
+getCountryListCmd : Flags -> Cmd Msg
+getCountryListCmd flags =
+    getCountryListTask flags
+        |> Task.attempt CountryListReceived
 
 
-getCountryList : Flags -> Cmd Msg
-getCountryList flags =
-    Http.get
-        { url = flags.apiUrl ++ "countries/list/"
-        , expect = Http.expectJson CountryListReceived (JD.list string)
+
+-- getInitialData : Flags -> Cmd Msg
+
+
+getInitialData : Flags -> Cmd Msg
+getInitialData flags =
+    let
+        listcountries =
+            getCountryListTask flags
+
+        firstcountry =
+            getEmissionsbyCountryTask "Finland" flags
+
+        secondcountry =
+            getEmissionsbyCountryTask "India" flags
+    in
+    Task.map3 (\x y z -> ( x, y, z )) listcountries firstcountry secondcountry
+        |> Task.attempt InitialDataReceived
+
+
+getEmissionsbyCountryTask : String -> Flags -> Task Http.Error CountryData
+getEmissionsbyCountryTask keyword flags =
+    get
+        { url = flags.apiUrl ++ "countries/" ++ keyword
+        , resolver = resolveJson countryDataDecoder
         }
 
 
 getEmissionsbyCountry : String -> Flags -> Cmd Msg
 getEmissionsbyCountry keyword flags =
-    Http.get
-        { url = flags.apiUrl ++ "countries/" ++ keyword
-        , expect = Http.expectJson ResultReceived countryDataDecoder
-        }
+    getEmissionsbyCountryTask keyword flags
+        |> Task.attempt ResultReceived
 
 
 countryDataDecoder : Decoder CountryData

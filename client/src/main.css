@@ -15,13 +15,13 @@
 body {
   font-family: monospace;
   margin: 0;
-  /* line-height: 1.5; */
+  line-height: 1.5;
   background-image: linear-gradient(to right, rgb(51,	195,105), rgb(45, 162, 153));
 }
 
 .main-wrap {
   max-width: 1280px;
-  border-radius: 15px;
+  border-radius: 10px;
   padding: 30px;
   height: 93vh;
   margin: 25px auto 0 auto;
@@ -40,6 +40,8 @@ body {
   font-size: 42px;
   font-family: Helvetica;
   color: rgb(45, 162, 153);
+  white-space: nowrap;
+
 }
 
 h2 {
@@ -181,6 +183,6 @@ h2 {
   width: 200px;
 
 }
-.autocomplete-item {
+/* .autocomplete-item {
 
-}
+} */
