@@ -102,11 +102,13 @@ update msg model =
             else
                 ( model, Cmd.none )
 
-        -- KeyDown key ->
-        --     if key == 13 && String.length model.keyword > 0 then
-        --         ( { model | loaded = Loading }, getEmissionsbyCountryCmd model.keyword model.envs )
-        --     else
-        --         ( model, Cmd.none )
+        KeyDown key ->
+            if key == 13 && String.length model.keyword > 0 then
+                ( { model | loaded = Loading }, getEmissionsbyCountryCmd model.keyword model.envs )
+
+            else
+                ( model, Cmd.none )
+
         ResultReceived result ->
             case result of
                 Ok output ->
@@ -128,6 +130,7 @@ update msg model =
             let
                 newModel =
                     setQuery model id
+                        |> resetInput
             in
             ( newModel, getEmissionsbyCountryCmd id model.envs )
 
@@ -135,10 +138,11 @@ update msg model =
             let
                 newModel =
                     setQuery model id
-                        |> resetMenu
+                        |> resetInput
             in
             ( newModel, getEmissionsbyCountryCmd id model.envs )
 
+        -- DOM
         SetAutoState autoMsg ->
             let
                 ( newState, maybeMsg ) =
@@ -237,9 +241,12 @@ getCountryAtId countrylist id =
 
 setQuery : Model -> String -> Model
 setQuery model id =
+    -- { model
+    --     | keyword = getCountryAtId model.countrylist id
+    --     , selectedCountry = Just (getCountryAtId model.countrylist id)
+    -- }
     { model
         | keyword = getCountryAtId model.countrylist id
-        , selectedCountry = Just (getCountryAtId model.countrylist id)
     }
 
 
@@ -268,7 +275,9 @@ updateConfig =
                     Just Reset
         , onTooLow = Nothing
         , onTooHigh = Nothing
-        , onMouseEnter = \id -> Just (PreviewCountry id)
+
+        -- , onMouseEnter = \id -> Just (PreviewCountry id)
+        , onMouseEnter = \_ -> Nothing
         , onMouseLeave = \_ -> Nothing
         , onMouseClick = \id -> Just (SelectCountryMouse id)
         , separateSelections = False

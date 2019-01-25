@@ -8,7 +8,7 @@ import Menu
 type Msg
     = InitialDataReceived (Result Http.Error InitialData)
     | Change String
-      -- | KeyDown Int
+    | KeyDown Int
     | SearchAndAdd
     | ResultReceived (Result Http.Error CountryData)
     | RemoveCountry String
