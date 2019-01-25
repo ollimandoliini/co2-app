@@ -1,4 +1,4 @@
-module Main exposing (countryDataDecoder, getEmissionsbyCountry, init, main, showResult, subscriptions, update, view)
+module Main exposing (acceptableCountries, addCountryData, countryDataDecoder, countryItem, filterEmptyDataPoints, getCountryAtId, getCountryListTask, getEmissionsbyCountryCmd, getEmissionsbyCountryTask, getInitialData, init, listCountries, main, onKeyDown, plot, removeCountry, removeSelection, removeZeros, resetMenu, searchView, setQuery, showResult, subscriptions, update, updateConfig, view, viewConfig, viewMenu)
 
 import Array
 import Browser
@@ -12,7 +12,7 @@ import Http.Tasks exposing (..)
 import Json.Decode as JD exposing (Decoder, field, float, int, string)
 import List.Extra exposing (uniqueBy)
 import Menu
-import Model exposing (CountryData, Datapoint, Flags, LoadingStatus(..), Model, Msg(..))
+import Model exposing (CountryData, Datapoint, Flags, InitialData, LoadingStatus(..), Model, Msg(..))
 import Plot exposing (linechart)
 import Task exposing (Task)
 
@@ -48,7 +48,7 @@ init flags =
       , selectedCountry = Nothing
       , showMenu = False
       }
-    , Cmd.none
+    , getInitialData flags
     )
 
 
@@ -56,24 +56,39 @@ init flags =
 -- UPDATE
 
 
+addInitialData : Model -> InitialData -> Model
+addInitialData model initialdata =
+    let
+        countrylist =
+            (\( x, y, z ) -> x) initialdata
+
+        countries =
+            (\( x, y, z ) -> [ y, z ]) initialdata
+
+        firstcountry =
+            (\( x, y, z ) -> y) initialdata
+
+        secondcountry =
+            (\( x, y, z ) -> z) initialdata
+
+        initialcountrydata =
+            model.countries
+                |> addCountryData firstcountry
+                |> addCountryData secondcountry
+    in
+    { model | countrylist = countrylist, countries = initialcountrydata }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case Debug.log "message" msg of
-        CountryListReceived result ->
-            case result of
-                Ok output ->
-                    ( { model | countrylist = output }, Cmd.none )
-
-                Err _ ->
-                    ( model, Cmd.none )
-
         InitialDataReceived result ->
             case result of
                 Ok output ->
-                    ( model, Cmd.none )
+                    ( addInitialData model output, Cmd.none )
 
                 Err _ ->
-                    ( model, Cmd.none )
+                    ( { model | loaded = Failure }, Cmd.none )
 
         Change newContent ->
             let
@@ -84,14 +99,14 @@ update msg model =
 
         SearchAndAdd ->
             if String.length model.keyword > 0 then
-                ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
+                ( { model | loaded = Loading }, getEmissionsbyCountryCmd model.keyword model.envs )
 
             else
                 ( model, Cmd.none )
 
         KeyDown key ->
             if key == 13 && String.length model.keyword > 0 then
-                ( { model | loaded = Loading }, getEmissionsbyCountry model.keyword model.envs )
+                ( { model | loaded = Loading }, getEmissionsbyCountryCmd model.keyword model.envs )
 
             else
                 ( model, Cmd.none )
@@ -99,10 +114,13 @@ update msg model =
         ResultReceived result ->
             case result of
                 Ok output ->
-                    ( { model | loaded = Success output, countries = addCountryData model.countries output, keyword = "" }, Cmd.none )
+                    ( { model | loaded = Success output, countries = addCountryData output model.countries, keyword = "" }, Cmd.none )
 
                 Err _ ->
                     ( { model | loaded = Failure }, Cmd.none )
+
+        PreviewCountry id ->
+            ( { model | selectedCountry = Just (getCountryAtId model.countrylist id) }, Cmd.none )
 
         RemoveCountry countryname ->
             ( { model | countries = removeCountry model.countries countryname }, Cmd.none )
@@ -123,7 +141,7 @@ update msg model =
                     setQuery model id
                         |> resetMenu
             in
-            ( newModel, getEmissionsbyCountry id model.envs )
+            ( newModel, getEmissionsbyCountryCmd id model.envs )
 
         SetAutoState autoMsg ->
             let
@@ -194,14 +212,17 @@ updateConfig =
         { toId = identity
         , onKeyDown =
             \code maybeId ->
-                if code == 13 then
+                if code == 38 || code == 40 then
+                    Maybe.map PreviewCountry maybeId
+
+                else if code == 13 then
                     Maybe.map SelectCountryKeyboard maybeId
 
                 else
                     Just Reset
         , onTooLow = Nothing
         , onTooHigh = Nothing
-        , onMouseEnter = \_ -> Nothing
+        , onMouseEnter = \id -> Just (PreviewCountry id)
         , onMouseLeave = \_ -> Nothing
         , onMouseClick = \id -> Just (SelectCountryMouse id)
         , separateSelections = False
@@ -223,8 +244,8 @@ viewConfig =
         }
 
 
-addCountryData : List CountryData -> CountryData -> List CountryData
-addCountryData oldList countrydataitem =
+addCountryData : CountryData -> List CountryData -> List CountryData
+addCountryData countrydataitem oldList =
     List.Extra.uniqueBy .country (oldList ++ [ filterEmptyDataPoints countrydataitem ])
 
 
@@ -330,7 +351,10 @@ showResult model =
                 ]
 
         Initial ->
-            div [ class "result griditem" ] []
+            div
+                [ class "result griditem" ]
+                [ plot model
+                ]
 
 
 plot : Model -> Html Msg
@@ -369,12 +393,6 @@ getCountryListTask flags =
         }
 
 
-getCountryListCmd : Flags -> Cmd Msg
-getCountryListCmd flags =
-    getCountryListTask flags
-        |> Task.attempt CountryListReceived
-
-
 
 -- getInitialData : Flags -> Cmd Msg
 
@@ -403,8 +421,8 @@ getEmissionsbyCountryTask keyword flags =
         }
 
 
-getEmissionsbyCountry : String -> Flags -> Cmd Msg
-getEmissionsbyCountry keyword flags =
+getEmissionsbyCountryCmd : String -> Flags -> Cmd Msg
+getEmissionsbyCountryCmd keyword flags =
     getEmissionsbyCountryTask keyword flags
         |> Task.attempt ResultReceived
 

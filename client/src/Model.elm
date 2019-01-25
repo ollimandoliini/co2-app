@@ -1,4 +1,4 @@
-module Model exposing (CountryData, Datapoint, Flags, LoadingStatus(..), Model, Msg(..))
+module Model exposing (CountryData, Datapoint, Flags, InitialData, LoadingStatus(..), Model, Msg(..))
 
 import Http exposing (Error)
 import Json.Decode as JD exposing (Decoder, field, float, int, string)
@@ -6,8 +6,7 @@ import Menu
 
 
 type Msg
-    = CountryListReceived (Result Http.Error (List String))
-    | InitialDataReceived (Result Http.Error InitialData)
+    = InitialDataReceived (Result Http.Error InitialData)
     | Change String
     | KeyDown Int
     | SearchAndAdd
@@ -17,15 +16,13 @@ type Msg
     | SelectCountryKeyboard String
     | SelectCountryMouse String
     | SetAutoState Menu.Msg
+    | PreviewCountry String
     | Reset
     | NoOp
 
 
 type alias InitialData =
-    ( countrylist : List String
-    , firstcountry : CountryData
-    , secondcountry : CountryData
-    )
+    ( List String, CountryData, CountryData )
 
 
 type alias Flags =
