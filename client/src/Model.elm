@@ -8,7 +8,7 @@ import Menu
 type Msg
     = InitialDataReceived (Result Http.Error InitialData)
     | Change String
-    | KeyDown Int
+      -- | KeyDown Int
     | SearchAndAdd
     | ResultReceived (Result Http.Error CountryData)
     | RemoveCountry String
@@ -17,6 +17,9 @@ type Msg
     | SelectCountryMouse String
     | SetAutoState Menu.Msg
     | PreviewCountry String
+    | OnFocus
+    | SetQuery String
+    | HandleEscape
     | Reset
     | NoOp
 

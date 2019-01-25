@@ -5,7 +5,7 @@ import Browser
 import Browser.Dom as Dom
 import Color exposing (Color)
 import Html exposing (Attribute, Html, button, div, form, h1, h2, input, label, li, p, span, table, tbody, text, th, thead, tr, ul)
-import Html.Attributes exposing (..)
+import Html.Attributes as Attrs exposing (..)
 import Html.Events exposing (..)
 import Http
 import Http.Tasks exposing (..)
@@ -62,9 +62,6 @@ addInitialData model initialdata =
         countrylist =
             (\( x, y, z ) -> x) initialdata
 
-        countries =
-            (\( x, y, z ) -> [ y, z ]) initialdata
-
         firstcountry =
             (\( x, y, z ) -> y) initialdata
 
@@ -81,7 +78,8 @@ addInitialData model initialdata =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case Debug.log "message" msg of
+    -- case Debug.log "message" msg of
+    case msg of
         InitialDataReceived result ->
             case result of
                 Ok output ->
@@ -104,13 +102,11 @@ update msg model =
             else
                 ( model, Cmd.none )
 
-        KeyDown key ->
-            if key == 13 && String.length model.keyword > 0 then
-                ( { model | loaded = Loading }, getEmissionsbyCountryCmd model.keyword model.envs )
-
-            else
-                ( model, Cmd.none )
-
+        -- KeyDown key ->
+        --     if key == 13 && String.length model.keyword > 0 then
+        --         ( { model | loaded = Loading }, getEmissionsbyCountryCmd model.keyword model.envs )
+        --     else
+        --         ( model, Cmd.none )
         ResultReceived result ->
             case result of
                 Ok output ->
@@ -133,7 +129,7 @@ update msg model =
                 newModel =
                     setQuery model id
             in
-            ( newModel, Cmd.none )
+            ( newModel, getEmissionsbyCountryCmd id model.envs )
 
         SelectCountryMouse id ->
             let
@@ -167,8 +163,58 @@ update msg model =
             , Cmd.none
             )
 
+        SetQuery newQuery ->
+            let
+                showMenu =
+                    not (List.isEmpty (acceptableCountries newQuery model.countrylist))
+            in
+            ( { model
+                | keyword = newQuery
+                , showMenu = showMenu
+                , selectedCountry = Nothing
+              }
+            , Cmd.none
+            )
+
+        HandleEscape ->
+            let
+                validOptions =
+                    not (List.isEmpty (acceptableCountries model.keyword model.countrylist))
+
+                handleEscape =
+                    if validOptions then
+                        model
+                            |> removeSelection
+                            |> resetMenu
+
+                    else
+                        resetInput model
+
+                escapedModel =
+                    case model.selectedCountry of
+                        Just country ->
+                            if model.keyword == country then
+                                resetInput model
+
+                            else
+                                handleEscape
+
+                        Nothing ->
+                            handleEscape
+            in
+            ( escapedModel, Cmd.none )
+
+        OnFocus ->
+            ( model, Cmd.none )
+
         NoOp ->
             ( model, Cmd.none )
+
+
+resetInput model =
+    { model | keyword = "" }
+        |> removeSelection
+        |> resetMenu
 
 
 removeSelection model =
@@ -314,12 +360,69 @@ searchView model =
 
             else
                 Html.text ""
+
+        query =
+            model.selectedCountry
+                |> Maybe.map identity
+                |> Maybe.withDefault model.keyword
+
+        activeDescendant attributes =
+            model.selectedCountry
+                |> Maybe.map identity
+                |> Maybe.map (Attrs.attribute "aria-activedescendant")
+                |> Maybe.map (\attribute -> attribute :: attributes)
+                |> Maybe.withDefault attributes
+
+        upDownEscDecoderHelper : Int -> Decoder Msg
+        upDownEscDecoderHelper code =
+            if code == 38 || code == 40 then
+                JD.succeed NoOp
+
+            else if code == 27 then
+                JD.succeed HandleEscape
+
+            else
+                JD.fail "not handling that key"
+
+        upDownEscDecoder : Decoder ( Msg, Bool )
+        upDownEscDecoder =
+            Html.Events.keyCode
+                |> JD.andThen upDownEscDecoderHelper
+                |> JD.map (\msg -> ( msg, True ))
     in
     div []
-        [ input [ class "searchField", placeholder "e.g.  Finland", onKeyDown KeyDown, onInput Change, value model.keyword ] []
-        , button [ class "searchButton", onClick SearchAndAdd ] [ text "Add" ]
-        , menu
-        ]
+        (List.append
+            [ Html.input
+                (activeDescendant
+                    [ Html.Events.onInput SetQuery
+                    , Html.Events.onFocus OnFocus
+                    , Html.Events.preventDefaultOn "keydown" upDownEscDecoder
+                    , Attrs.value query
+                    , Attrs.class "searchField"
+                    , Attrs.autocomplete False
+                    , Attrs.attribute "aria-owns" "list-of-countries"
+                    , Attrs.attribute "aria-expanded" (boolToString model.showMenu)
+                    , Attrs.attribute "aria-haspopup" (boolToString model.showMenu)
+                    , Attrs.attribute "role" "combobox"
+                    , Attrs.attribute "aria-autocomplete" "list"
+                    ]
+                )
+                []
+            ]
+            [ menu
+            , button [ class "searchButton", onClick SearchAndAdd ] [ text "Add" ]
+            ]
+        )
+
+
+boolToString : Bool -> String
+boolToString bool =
+    case bool of
+        True ->
+            "true"
+
+        False ->
+            "false"
 
 
 viewMenu : Model -> Html Msg
@@ -374,10 +477,10 @@ listCountries countrieslist =
 countryItem : CountryData -> Html Msg
 countryItem countrydata =
     let
-        deletechar =
+        deleteChar =
             String.fromChar (Char.fromCode 10005)
     in
-    span [ onClick (RemoveCountry countrydata.country), class "country-item" ] [ li [] [ text (countrydata.country ++ " " ++ deletechar) ] ]
+    span [ onClick (RemoveCountry countrydata.country), class "country-item" ] [ li [] [ text (countrydata.country ++ " " ++ deleteChar) ] ]
 
 
 removeCountry : List CountryData -> String -> List CountryData
@@ -391,10 +494,6 @@ getCountryListTask flags =
         { url = flags.apiUrl ++ "countries/"
         , resolver = resolveJson (JD.list string)
         }
-
-
-
--- getInitialData : Flags -> Cmd Msg
 
 
 getInitialData : Flags -> Cmd Msg
