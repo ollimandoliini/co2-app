@@ -49,12 +49,20 @@ def get_country_data(country):
 
     combined_data = []
     for k, v in co2_dict.items():
-        metric_tons_per_capita = v / population_dict[k] * 1000
+        per_capita = metric_tons_per_capita(v, population_dict[k])
+
         dict_item = {'year': int(k), 'co2_kilotons': v,
                      'population': population_dict[k],
-                     'co2_per_capita': metric_tons_per_capita}
+                     'co2_per_capita': per_capita}
         combined_data.append(dict_item)
     return combined_data
+
+
+def metric_tons_per_capita(co2, population):
+    if population == 0:
+        return 0
+    else:
+        return co2 / population * 1000
 
 
 def get_country_plot(country, percapita=False):

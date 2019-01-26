@@ -14,3 +14,7 @@ node_modules
 .DS_Store
 
 .env
+
+api/backupdata
+api/df.py
+api/resources

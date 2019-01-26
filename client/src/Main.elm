@@ -495,14 +495,6 @@ removeCountry oldlist countryname =
     List.filter (\countryData -> countryData.country /= countryname) oldlist
 
 
-getCountryListTask : Flags -> Task Http.Error (List String)
-getCountryListTask flags =
-    get
-        { url = flags.apiUrl ++ "countries/"
-        , resolver = resolveJson (JD.list string)
-        }
-
-
 getInitialData : Flags -> Cmd Msg
 getInitialData flags =
     let
@@ -517,6 +509,14 @@ getInitialData flags =
     in
     Task.map3 (\x y z -> ( x, y, z )) listcountries firstcountry secondcountry
         |> Task.attempt InitialDataReceived
+
+
+getCountryListTask : Flags -> Task Http.Error (List String)
+getCountryListTask flags =
+    get
+        { url = flags.apiUrl ++ "countries/"
+        , resolver = resolveJson (JD.list string)
+        }
 
 
 getEmissionsbyCountryTask : String -> Flags -> Task Http.Error CountryData
