@@ -10,9 +10,15 @@ Technology stack:
 - Frontend: Elm
 - Backend: Python/Flask
 
+## Setup
+
+Environmental variables:
+`ELM_APP_API_URL=backendurl`
+
+
 Installation:
 1. `git clone git@github.com:ollimandoliini/co2-app.git`
-2. `cd api && pipenv install`
-3. `pipenv run python api.py`
+2. `cd co2-app/api && pipenv install`
+3. `pipenv run python app.py`
 4. `cd .. && npm install`
 5. `cd client && elm-app start`
