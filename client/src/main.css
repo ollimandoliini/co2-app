@@ -65,60 +65,10 @@ h2 {
   line-height: 2;
 }
 
-@media (max-width: 500px) {
-  .main-wrap {
-    padding: 10px;
-    margin: 5px 0;
-    height: 99vh;
-  }
-  .searchAndCountryList {
-    margin: 0 10px;
 
-  }
-  .infocontainer {
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-    height: 240px;
-  }
-  h2 {
-    margin: 5px 0;
-    font-size: 14px;
-  }
-  .country-item {
-    list-style-type: none;
-    font-size: 10px;
-    border: 2px solid;
-    border-radius: 4px;
-    padding: 3px 6px;
-    margin: 2px;
-    transition: all .2s ease-in-out; 
-  }
-}
-
-
-@media (min-width: 700px) {
-  .main-wrap {
-    grid-gap: 20px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
-  }
-  .titleAndText {
-    grid-column: 1;
-    grid-row: 1 / span 4;
-  }
-  .result {
-    grid-column: 2 / span 3;
-    grid-row: 2 / span 3;
-  }
-  .searchAndCountryList {
-    grid-column: 2 / span 3;
-    grid-row: 1;
-    margin: 20px 100px
-  }
 
   
-}
+
 .result, .searchAndCountryList, .title {
     -webkit-user-select: none; /* Safari */        
     -moz-user-select: none; /* Firefox */
@@ -215,4 +165,60 @@ h2 {
   position:absolute;
   background-color: white;
 
+}
+
+@media (max-width: 500px) {
+  .main-wrap {
+    padding: 10px;
+    margin: 5px 0;
+    height: 99vh;
+  }
+  .searchAndCountryList {
+    margin: 0 10px;
+
+  }
+  .infocontainer {
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    height: 240px;
+  }
+  h2 {
+    margin: 5px 0;
+    font-size: 14px;
+  }
+  .country-item {
+    list-style-type: none;
+    font-size: 12px;
+    border: 2px solid;
+    border-radius: 4px;
+    padding: 3px 6px;
+    margin: 2px;
+    transition: all .2s ease-in-out; 
+  }
+  .title {
+    margin: 10px auto;
+  }
+}
+
+
+@media (min-width: 700px) {
+  .main-wrap {
+    grid-gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+  }
+  .titleAndText {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+  }
+  .result {
+    grid-column: 2 / span 3;
+    grid-row: 2 / span 3;
+  }
+  .searchAndCountryList {
+    grid-column: 2 / span 3;
+    grid-row: 1;
+    margin: 20px 100px
+  }
 }
