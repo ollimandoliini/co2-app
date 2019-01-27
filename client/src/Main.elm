@@ -300,12 +300,6 @@ addCountryData countrydataitem oldList =
     List.Extra.uniqueBy .country (oldList ++ [ filterEmptyDataPoints countrydataitem ])
 
 
-
--- oldList
---     |> List.append [ filterEmptyDataPoints countrydataitem ]
---     |> List.Extra.uniqueBy .country
-
-
 filterEmptyDataPoints : CountryData -> CountryData
 filterEmptyDataPoints country =
     { country | dataPoints = removeZeros country.dataPoints }
@@ -349,7 +343,9 @@ view model =
                 [ div [ class "searchbar" ]
                     [ searchView model
                     ]
-                , listCountries model.countries
+                ]
+            , div [ class "countrylist" ]
+                [ listCountries model.countries
                 ]
             ]
         , showResult model

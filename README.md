@@ -14,6 +14,7 @@ Technology stack:
 
 Environmental variables:
 `ELM_APP_API_URL=backendurl`
+`ELM_DEBUGGER=false` [Due to this](https://github.com/elm/compiler/issues/1802)
 
 
 Installation:
