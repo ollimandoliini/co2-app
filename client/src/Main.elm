@@ -78,8 +78,7 @@ addInitialData model initialdata =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case Debug.log "message" msg of
-        -- case msg of
+    case msg of
         InitialDataReceived result ->
             case result of
                 Ok output ->
@@ -161,16 +160,57 @@ update msg model =
 
         SetQuery newQuery ->
             let
+                newMenuState =
+                    Menu.resetToFirstItem updateConfig (acceptableCountries newQuery model.countrylist) model.menuHowManyToShow model.autoState
+
                 showMenu =
                     not (List.isEmpty (acceptableCountries newQuery model.countrylist))
             in
             ( { model
                 | keyword = newQuery
+                , autoState = newMenuState
                 , showMenu = showMenu
                 , selectedCountry = Nothing
               }
             , Cmd.none
             )
+
+        Wrap toTop ->
+            case model.selectedCountry of
+                Just country ->
+                    update Reset model
+
+                Nothing ->
+                    if toTop then
+                        ( { model
+                            | autoState =
+                                Menu.resetToLastItem updateConfig
+                                    (acceptableCountries model.keyword model.countrylist)
+                                    model.menuHowManyToShow
+                                    model.autoState
+                            , selectedCountry =
+                                acceptableCountries model.keyword model.countrylist
+                                    |> List.take model.menuHowManyToShow
+                                    |> List.reverse
+                                    |> List.head
+                          }
+                        , Cmd.none
+                        )
+
+                    else
+                        ( { model
+                            | autoState =
+                                Menu.resetToFirstItem updateConfig
+                                    (acceptableCountries model.keyword model.countrylist)
+                                    model.menuHowManyToShow
+                                    model.autoState
+                            , selectedCountry =
+                                acceptableCountries model.keyword model.countrylist
+                                    |> List.take model.menuHowManyToShow
+                                    |> List.head
+                          }
+                        , Cmd.none
+                        )
 
         HandleEscape ->
             let
@@ -329,7 +369,7 @@ view model =
         mainTitle =
             "CO" ++ String.fromChar (Char.fromCode 8322) ++ " EMISSIONS"
     in
-    div [ class "main-wrap" ]
+    div [ class "main-wrap", onClick HandleEscape ]
         [ div [ class "titleAndText griditem" ]
             [ h1 [ class "title" ] [ text mainTitle ]
             , div [ class "" ]

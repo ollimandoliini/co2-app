@@ -20,6 +20,7 @@ type Msg
     | SetQuery String
     | HandleEscape
     | Reset
+    | Wrap Bool
     | NoOp
 
 
