@@ -25,5 +25,5 @@ Installation:
 5. `cd client && elm-app start`
 
 
-[Docker]: <> (`docker run -p 5000:5000 -v $(pwd):/opt/code -w /opt/code -it kennethreitz/pipenv bash -c "pipenv install && pipenv run python app.py"`)
-[NPX]: <> (`cd client && npx elm-app start`)
+[Docker]: # (`docker run -p 5000:5000 -v $(pwd):/opt/code -w /opt/code -it kennethreitz/pipenv bash -c "pipenv install && pipenv run python app.py"`)
+[NPX]: # (`cd client && npx elm-app start`)
