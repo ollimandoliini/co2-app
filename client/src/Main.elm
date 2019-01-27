@@ -286,8 +286,9 @@ view model =
         [ div [ class "titleAndText griditem" ]
             [ h1 [ class "title" ] [ text mainTitle ]
             , div [ class "" ]
-                [ p [ class "info" ] [ text "Explore carbon dioxide emissions by country in absolute and per capita values." ]
-                , p [ class "info" ] [ text "Add countries by entering them into the input below." ]
+                [ p [ class "info" ] [ text "When talking about climate change, some people say that small countries like Finland don't matter when comparing to giants like India or China." ]
+                , p [ class "info" ] [ text "And if you only look at absolute values that does make sense. However, emissions per capita tell a totally different story. Click the graph and see for yourself." ]
+                , p [ class "info" ] [ text "Explore other countries' CO2-emissions by adding them to the input." ]
                 ]
             ]
         , div [ class "searchAndCountryList griditem" ]
@@ -315,7 +316,7 @@ showResult model =
                 ]
 
         Loading ->
-            div [ class "result griditem" ] [ text "Loading..." ]
+            div [ class "result griditem" ] [ text "Loading...", plot model ]
 
         Success output ->
             div
@@ -335,7 +336,6 @@ plot model =
     div
         [ class "plot-container", id "plot-container", onClick TogglePerCapita ]
         [ linechart model
-        , div [ class "clickinfo" ] [ text "Click the plot to switch between absolute and per capita values" ]
         ]
 
 
