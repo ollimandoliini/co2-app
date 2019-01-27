@@ -18,3 +18,7 @@ node_modules
 api/backupdata
 api/df.py
 api/resources
+.vscode
+.netlify
+
+__pyche__

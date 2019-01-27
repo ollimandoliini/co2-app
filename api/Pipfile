@@ -8,6 +8,7 @@ pandas = "*"
 flask-restful = "*"
 matplotlib = "*"
 gunicorn = "*"
+wbdata = "*"
 
 [dev-packages]
 
