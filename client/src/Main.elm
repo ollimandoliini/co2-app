@@ -135,7 +135,6 @@ update msg model =
             in
             ( newModel, getEmissionsbyCountryCmd id model.envs )
 
-        -- DOM
         SetAutoState autoMsg ->
             let
                 ( newState, maybeMsg ) =
