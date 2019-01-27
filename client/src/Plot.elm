@@ -23,7 +23,7 @@ linechart : Model -> Html.Html msg
 linechart model =
     LineChart.viewCustom
         { y =
-            Axis.full 450
+            Axis.full 550
                 (if model.percapita then
                     "CO2 Per Capita"
 
@@ -36,11 +36,11 @@ linechart model =
                  else
                     .co2_kilotons
                 )
-        , x = Axis.default 800 "Year" .year
+        , x = Axis.default 900 "Year" .year
         , container = containerConfig
         , interpolation = Interpolation.default
         , intersection = Intersection.default
-        , legends = Legends.grouped .max .min -580 -370
+        , legends = Legends.grouped .max .min -650 -490
 
         -- , legends = Legends.default
         , events = Events.default

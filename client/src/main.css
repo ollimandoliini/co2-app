@@ -33,7 +33,7 @@ body {
   margin: 1rem auto;
   background-color: rgb(243, 243, 243);
   display: grid;
-  grid-gap: 10px;
+  grid-gap: 0px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   grid-template-areas:
   "titleandtext"
@@ -41,6 +41,8 @@ body {
   "plotcontainer";
 
 }
+
+
 
 .title {
   margin: 30px 0px;
@@ -60,8 +62,8 @@ h2 {
 }
 .info {
   font-size: 14px;
+  line-height: 2;
 }
-
 
 @media (max-width: 500px) {
   .main-wrap {
@@ -70,7 +72,26 @@ h2 {
     height: 99vh;
   }
   .searchAndCountryList {
-    padding: 20px  ;
+    margin: 0 10px;
+
+  }
+  .infocontainer {
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    height: 240px;
+  }
+  h2 {
+    margin: 5px 0;
+    font-size: 14px;
+  }
+  .country-item {
+    list-style-type: none;
+    font-size: 10px;
+    border: 2px solid;
+    border-radius: 4px;
+    padding: 3px 6px;
+    margin: 2px;
+    transition: all .2s ease-in-out; 
   }
 }
 
@@ -156,34 +177,27 @@ h2 {
   border-radius: 4px;
   padding: 3px 6px;
   margin: 2px;
-   transition: all .2s ease-in-out; 
+  transition: all .2s ease-in-out; 
 }
 .country-item:hover{
-  transform: scale(1.01);
+  transform: scale(1.05);
 }
 
 .result {
   width: 100%;
   text-align: center;
   overflow: visible;
+  font-size: 13px;
 }
 
 .plot-container {
   cursor: pointer;
-  grid-area: plotcontainer;
 }
 
 .is-selected, .key-selected {
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-.country-item {
-  cursor: pointer;
-}
-.chart__legends {
-  background-color: red;
-  margin: 5px;
-}
 
 
 
@@ -200,11 +214,5 @@ h2 {
   width: 200px;
   position:absolute;
   background-color: white;
-  /* z-index:100; */
-  /* left:10%;
-  top:0; */
 
 }
-/* .autocomplete-item {
-
-} */

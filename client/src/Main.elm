@@ -285,7 +285,7 @@ view model =
     div [ class "main-wrap", onClick HandleEscape ]
         [ div [ class "titleAndText griditem" ]
             [ h1 [ class "title" ] [ text mainTitle ]
-            , div [ class "" ]
+            , div [ class "infocontainer" ]
                 [ p [ class "info" ] [ text "When talking about climate change, some people say that small countries like Finland don't matter when comparing to giants like India or China." ]
                 , p [ class "info" ] [ text "And if you only look at absolute values that does make sense. However, emissions per capita tell a totally different story. Click the graph and see for yourself." ]
                 , p [ class "info" ] [ text "Explore other countries' CO2-emissions by adding them to the input." ]
