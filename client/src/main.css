@@ -111,8 +111,11 @@ h2 {
   text-align: center;
   color: #fff;
   border-radius: 5px;
+  border: 0;
   cursor: pointer;
   font-size: 20px; 
+  height: 29px;
+  width: 65px;
 }
 
 
@@ -178,6 +181,14 @@ h2 {
 
 }
 
+.chart__axis--vertical > .chart__title {
+  transform: translate(100px,20px);
+  -ms-transform: translate(100px,20px);
+  -webkit-transform: translate(100px,20px);
+  -o-transform: translate(100px,20px);
+  -moz-transform: translate(100px,20px);
+  }
+
 @media (max-width: 500px) {
   .root {
     padding: 5px 0;
@@ -191,7 +202,7 @@ h2 {
   }
   .searchAndCountryList {
     margin: 0 10px;
-    padding: 15px 10px;
+    padding: 0;
 
   }
   .left-column {
@@ -201,8 +212,11 @@ h2 {
     width: auto;
   }
   h2 {
-    margin: 5px 0;
+    margin: 2px 0;
     font-size: 14px;
+  }
+  p {
+    margin: 10px 0;
   }
   .country-item {
     list-style-type: none;
@@ -220,12 +234,12 @@ h2 {
     padding: 0;
     font-size: 20px;
   }
-  .chart__tick {
-    /* transform: translate(120px,0px);
-    -ms-transform: translate(120px,0px);
-    -webkit-transform: translate(120px,0px); 
-    -o-transform: translate(120px,0px); 
-    -moz-transform: translate(120px,0px); */
+  .chart__axis--vertical > .chart__title {
+    transform: translate(120px,20px);
+    -ms-transform: translate(120px,20px);
+    -webkit-transform: translate(120px,20px);
+    -o-transform: translate(120px,20px);
+    -moz-transform: translate(120px,20px);
   }
 
 }

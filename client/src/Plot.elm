@@ -42,7 +42,7 @@ linechart model =
         , intersection = Intersection.default
 
         -- , legends = Legends.grouped .max .min -530 -350
-        , legends = Legends.grouped .max .min -600 -350
+        , legends = Legends.grouped .max .min -580 -350
 
         -- , legends = Legends.default
         , events = Events.default
@@ -66,21 +66,9 @@ containerConfig =
         { attributesHtml = []
         , attributesSvg = []
         , size = Container.relative
-        , margin = Container.Margin 30 45 30 100
+        , margin = Container.Margin 30 45 30 70
         , id = "plot-area"
         }
-
-
-
--- containerConfig : Container.Config msg
--- containerConfig =
---     Container.custom
---         { attributesHtml = []
---         , attributesSvg = []
---         , size = Container.relative
---         , margin = Container.Margin 30 30 30 100
---         , id = "line-chart-area"
---         }
 
 
 colorTuple : List CountryData -> List ( CountryData, Color )
