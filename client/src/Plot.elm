@@ -66,7 +66,7 @@ containerConfig =
         { attributesHtml = []
         , attributesSvg = []
         , size = Container.relative
-        , margin = Container.Margin 30 45 30 70
+        , margin = Container.Margin 30 45 30 105
         , id = "plot-area"
         }
 

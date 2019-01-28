@@ -177,8 +177,9 @@ h2 {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 200px;
-  position:absolute;
+  position: absolute;
   background-color: white;
+  z-index: 1000;
 
 }
 
