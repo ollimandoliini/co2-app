@@ -290,6 +290,7 @@ view model =
                     [ p [ class "info" ] [ text "When talking about climate change, some people say that small countries like Finland don't matter when comparing to giants like India or China." ]
                     , p [ class "info" ] [ text "And if you only look at absolute values that does make sense. However, emissions per capita tell a totally different story. Click the graph and see for yourself." ]
                     , p [ class "info" ] [ text "Explore other countries' CO2-emissions by adding them to the input." ]
+                    , p [ class "info clicktheplot" ] [ text "Click the plot to switch between absolute and per capita values " ]
                     ]
                 ]
             , div [ class "right-column" ]

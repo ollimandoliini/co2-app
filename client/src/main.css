@@ -74,6 +74,9 @@ h2 {
   font-size: 14px;
   line-height: 2;
 }
+.clicktheplot {
+  font-weight: 600;
+}
 
 
 
@@ -125,9 +128,7 @@ h2 {
   font-size: 16px;
 }
 
-.clickinfo {
-  margin-top: 10px;
-}
+
 
 
 .country-list{
