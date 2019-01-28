@@ -23,23 +23,34 @@ body {
   line-height: 1.5;
   background-image: linear-gradient(to right, rgb(51,	195,105), rgb(45, 162, 153));
 }
+.root {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+
+}
 
 .main-wrap {
   max-width: 1280px;
   border-radius: 10px;
   padding: 30px;
-  height: calc(100vh - 2rem);
   box-sizing: border-box;
-  margin: 1rem auto;
   background-color: rgb(243, 243, 243);
-  display: grid;
-  grid-gap: 0px;
+  display: flex;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-  grid-template-areas:
-  "titleandtext"
-  "searchandcountrylist"
-  "plotcontainer";
+  min-height: calc(100vh - 3rem); 
+  justify-content: space-between;
 
+
+}
+
+.left-column {
+  width: 28%;
+}
+
+.right-column {
+  width: 68%;
+  align-items: center;
 }
 
 
@@ -49,7 +60,6 @@ body {
   font-size: 42px;
   font-family: Helvetica;
   color: rgb(45, 162, 153);
-  white-space: nowrap;
 
 }
 
@@ -67,14 +77,17 @@ h2 {
 
 
 
-  
-
 .result, .searchAndCountryList, .title {
     -webkit-user-select: none; /* Safari */        
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE10+/Edge */
     user-select: none; /* Standard */
     -webkit-tap-highlight-color: transparent;
+}
+
+.searchAndCountryList {
+  padding: 20px;
+
 }
 
 .searchbar {
@@ -134,10 +147,10 @@ h2 {
 }
 
 .result {
-  width: 100%;
   text-align: center;
   overflow: visible;
   font-size: 13px;
+  padding: 100px 0;
 }
 
 .plot-container {
@@ -147,8 +160,6 @@ h2 {
 .is-selected, .key-selected {
   background-color: rgba(0, 0, 0, 0.1);
 }
-
-
 
 
 .autocomplete-list {
@@ -168,19 +179,26 @@ h2 {
 }
 
 @media (max-width: 500px) {
+  .root {
+    padding: 5px 0;
+    justify-content: left;
+  }
   .main-wrap {
-    padding: 10px;
-    margin: 5px 0;
-    height: 99vh;
+    flex-direction: column;
+    width: auto;
+    padding: 6px;
+
   }
   .searchAndCountryList {
     margin: 0 10px;
+    padding: 15px 10px;
 
   }
-  .infocontainer {
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-    height: 240px;
+  .left-column {
+    width: auto;
+  }
+  .right-column{
+    width: auto;
   }
   h2 {
     margin: 5px 0;
@@ -198,27 +216,17 @@ h2 {
   .title {
     margin: 10px auto;
   }
-}
-
-
-@media (min-width: 700px) {
-  .main-wrap {
-    grid-gap: 20px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
-  }
-  .titleAndText {
-    grid-column: 1;
-    grid-row: 1 / span 4;
-  }
   .result {
-    grid-column: 2 / span 3;
-    grid-row: 2 / span 3;
+    padding: 0;
+    font-size: 20px;
   }
-  .searchAndCountryList {
-    grid-column: 2 / span 3;
-    grid-row: 1;
-    margin: 20px 100px
+  .chart__tick {
+    /* transform: translate(120px,0px);
+    -ms-transform: translate(120px,0px);
+    -webkit-transform: translate(120px,0px); 
+    -o-transform: translate(120px,0px); 
+    -moz-transform: translate(120px,0px); */
   }
+
 }
+

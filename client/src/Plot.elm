@@ -25,10 +25,10 @@ linechart model =
         { y =
             Axis.full 400
                 (if model.percapita then
-                    "CO2 Per Capita"
+                    "Per Capita"
 
                  else
-                    "CO2 Absolute"
+                    "Absolute"
                 )
                 (if model.percapita then
                     .co2_per_capita
@@ -40,7 +40,9 @@ linechart model =
         , container = containerConfig
         , interpolation = Interpolation.default
         , intersection = Intersection.default
-        , legends = Legends.grouped .max .min -650 -490
+
+        -- , legends = Legends.grouped .max .min -530 -350
+        , legends = Legends.grouped .max .min -600 -350
 
         -- , legends = Legends.default
         , events = Events.default
@@ -64,9 +66,21 @@ containerConfig =
         { attributesHtml = []
         , attributesSvg = []
         , size = Container.relative
-        , margin = Container.Margin 20 110 20 110
-        , id = "line-chart-area"
+        , margin = Container.Margin 30 45 30 100
+        , id = "plot-area"
         }
+
+
+
+-- containerConfig : Container.Config msg
+-- containerConfig =
+--     Container.custom
+--         { attributesHtml = []
+--         , attributesSvg = []
+--         , size = Container.relative
+--         , margin = Container.Margin 30 30 30 100
+--         , id = "line-chart-area"
+--         }
 
 
 colorTuple : List CountryData -> List ( CountryData, Color )
